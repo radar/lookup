@@ -44,23 +44,23 @@ def find_constant(name, entry=nil)
   # Find by specific name.
   constants = @classes.select { |c| c.first == name }
   # Find by name beginning with <blah>.
-  constants = @classes.select { |c| /^#{name}.*/.match(c.first) } if constants.empty?
+  constants = @classes.select { |c| /^#{name}.*/.match(c.first) } if constants.empty?  
   # Find by name containing letters of <blah> in order.
   constants = @classes.select { |c| Regexp.new(name.split("").join(".*")).match(c.first) }
   if constants.size > 1
-      # Narrow it down to the constants that only contain the entry we are looking for.
-       constants = @classes.select { |constant| @methods.select { |m| /#{entry}/.match(m.first) && m[1] == "(#{constant})" } } if !entry.nil?
-       if constants.size > 1 
-         puts "More than one constant matched your search! 5 most likely (based on times referenced): #{constants.first(5).map(&:first).to_sentence}"
-       elsif constants.size == 1
-         return constants.first
-       else
-         if entry
-           puts "There are no constants that match #{name} and contain #{entry}."
-         else
-           puts "There are no constants that match #{name}"
-         end
-       end
+    # Narrow it down to the constants that only contain the entry we are looking for.
+    constants = constants.select { |constant| @methods.select { |m| m.first == entry && /#{entry} (#{constant.first})/.match([m.first, m[1]].join(" ")) } } if !entry.nil?
+    if constants.size == 1
+      return [[constants.first], 1]
+    elsif constants.size == 0
+      if entry
+        puts "There are no constants that match #{name} and contain #{entry}."
+      else
+        puts "There are no constants that match #{name}"
+      end
+    else
+      return [constants, constants.size]
+    end
   else
     if entry.nil?
       x = 0
@@ -68,8 +68,9 @@ def find_constant(name, entry=nil)
       for constant in constants
         puts "#{x += 1}. #{constant.first} #{constant.last}"
       end
+      return [constants, constants.size]
     else
-      constants.first
+      return [[constants.first], 1]
     end
   end
 end
@@ -78,17 +79,21 @@ end
  # If the constant argument is passed, look it up within the scope of the constant.
  def find_method(name, constant=nil)  
    if constant
-     constant = find_constant(constant, name)
+     constants, number = find_constant(constant, name)
    end
+   methods = [] 
    methods = @methods.select { |m| m.first == name}
    methods = @methods.select { |m| /#{name}.*/.match(m.first) } if methods.empty?
    methods = @methods.select { |m| Regexp.new(name.split("").join(".*")).match(m.first) } if methods.empty?   
-   methods = methods.select { |m| m[1] == "(#{constant.first})" } if constant
+   if constant
+     methods = methods.select { |m| /#{constants.join("|")}/.match(m[1]) }
+   end
    x = 0
    puts "Found #{methods.size} result(s):"
    for method in methods
-     puts "#{x += 1}. #{constant.nil? ? method[1].gsub(/[\(|\)]/, '') : constant.first}##{method.first} #{method.last}"
-   end
+      puts "#{x += 1}. #{method[1].gsub(/[\(|\)]/, '')}##{method.first} #{method.last}"
+    end
+   methods
  end
    
  
