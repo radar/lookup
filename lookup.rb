@@ -62,7 +62,15 @@ def find_constant(name, entry=nil)
          end
        end
   else
-    return constants.first
+    if entry.nil?
+      x = 0
+      puts "Found #{constants.size} result(s):"
+      for constant in constants
+        puts "#{x += 1}. #{constant.first} #{constant.last}"
+      end
+    else
+      constants.first
+    end
   end
 end
  
@@ -77,6 +85,7 @@ end
    methods = @methods.select { |m| Regexp.new(name.split("").join(".*")).match(m.first) } if methods.empty?   
    methods = methods.select { |m| m[1] == "(#{constant.first})" } if constant
    x = 0
+   puts "Found #{methods.size} result(s):"
    for method in methods
      puts "#{x += 1}. #{constant.nil? ? method[1].gsub(/[\(|\)]/, '') : constant.first}##{method.first} #{method.last}"
    end

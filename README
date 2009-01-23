@@ -1,0 +1,8 @@
+Really freakin' quick lookup for terminal
+
+To use it:
+ruby lookup.rb ActiveRecord::Base#new
+
+If two methods are returned it will show both:
+ruby lookup.rb ActiveRecord::Base#destroy
+
