@@ -109,13 +109,17 @@ end
      methods = methods.select { |m| /#{constants.join("|")}/.match(m[1]) }
    end
    x = 0
-   puts "Found #{methods.size} result(s):" unless DECENT_OPERATING_SYSTEM
-   for method in methods
-     if DECENT_OPERATING_SYSTEM
-       `open #{method.last}`
-     else
-       puts "#{x += 1}. #{method[1].gsub(/[\(|\)]/, '')}##{method.first} #{method.last}"
+   if methods.size < 10
+     puts "Found #{methods.size} result(s):" unless DECENT_OPERATING_SYSTEM
+     for method in methods
+       if DECENT_OPERATING_SYSTEM
+         `open #{method.last}`
+       else
+         puts "#{x += 1}. #{method[1].gsub(/[\(|\)]/, '')}##{method.first} #{method.last}"
+       end
      end
+   else
+     puts "Please refine your query, we found #{methods.size} methods."
    end
    methods
  end

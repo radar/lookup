@@ -12,8 +12,8 @@ Gem::Specification.new do |s|
   s.description = %q{A gem that provides a lazy man's ri}
   s.email = %q{radarlistener@gmail.com}
   s.executables = ["lookup"]
-  s.extra_rdoc_files = ["README", "LICENSE", "TODO"]
-  s.files = ["LICENSE", "README", "Rakefile", "TODO", "lib/classes", "lib/config.rb", "lib/lookup.rb", "lib/methods", "spec/lookup_spec.rb", "spec/spec_helper.rb", "bin/lookup"]
+  s.extra_rdoc_files = ["README.rdoc", "LICENSE", "TODO"]
+  s.files = ["LICENSE", "README.rdoc", "Rakefile", "TODO", "lib/classes", "lib/config.rb", "lib/lookup.rb", "lib/methods", "spec/lookup_spec.rb", "spec/spec_helper.rb", "bin/lookup"]
   s.has_rdoc = true
   s.homepage = %q{http://gitpilot.com}
   s.require_paths = ["lib"]
