@@ -39,8 +39,6 @@ def update_methods(url)
     end
   end
 end
- 
-ActiveRecord::Base.logger = Logger.new("lookup.log") if DEBUG
 
 def find_constant(name, entry=nil)
   # Find by specific name.
