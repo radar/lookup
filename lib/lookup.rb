@@ -47,6 +47,19 @@ def update_methods(url)
   end
 end
 
+def display_constants(constants)
+  x = 0
+  puts "Found #{constants.size} result(s):" unless DECENT_OPERATING_SYSTEM
+  for constant in constants
+    if DECENT_OPERATING_SYSTEM
+      `open #{constant.last}`
+    else
+      puts "#{x += 1}. #{constant.first} #{constant.last}"
+    end
+  end
+  [constants, constants.size]
+end
+
 def find_constant(name, entry=nil)
   # Find by specific name.
   constants = @classes.select { |c| c.first == name }
@@ -57,6 +70,7 @@ def find_constant(name, entry=nil)
   if constants.size > 1
     # Narrow it down to the constants that only contain the entry we are looking for.
     constants = constants.select { |constant| @methods.select { |m| m.first == entry && /#{entry} (#{constant.first})/.match([m.first, m[1]].join(" ")) } } if !entry.nil?
+    display_constants(constants)
     if constants.size == 1
       return [[constants.first], 1]
     elsif constants.size == 0
@@ -70,16 +84,7 @@ def find_constant(name, entry=nil)
     end
   else
     if entry.nil?
-      x = 0
-      puts "Found #{constants.size} result(s):" unless DECENT_OPERATING_SYSTEM
-      for constant in constants
-        if DECENT_OPERATING_SYSTEM
-          `open #{constant.last}`
-        else
-          puts "#{x += 1}. #{constant.first} #{constant.last}"
-        end
-      end
-      return [constants, constants.size]
+     display_constants(constants)
     else
       return [[constants.first], 1]
     end
@@ -129,6 +134,7 @@ end
       else
         object = find_method(parts.last, parts.first)
       end  
-   end 
+   end
+   object
  end
  lookup
