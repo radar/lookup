@@ -49,13 +49,17 @@ end
 
 def display_constants(constants)
   x = 0
-  puts "Found #{constants.size} result(s):" unless DECENT_OPERATING_SYSTEM
-  for constant in constants
-    if DECENT_OPERATING_SYSTEM
-      `open #{constant.last}`
-    else
-      puts "#{x += 1}. #{constant.first} #{constant.last}"
+  if constants.size < 10
+    puts "Found #{constants.size} result(s):" unless DECENT_OPERATING_SYSTEM
+    for constant in constants
+      if DECENT_OPERATING_SYSTEM
+        `open #{constant.last}`
+      else
+        puts "#{x += 1}. #{constant.first} #{constant.last}"
+      end
     end
+  else
+    puts "Please refine your query, we found #{constants.size} constants."
   end
   [constants, constants.size]
 end

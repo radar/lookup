@@ -5,7 +5,7 @@ require 'date'
 require 'spec/rake/spectask'
 
 GEM = "lookup"
-GEM_VERSION = "0.0.4"
+GEM_VERSION = "0.0.5"
 AUTHOR = "Ryan Bigg"
 EMAIL = "radarlistener@gmail.com"
 HOMEPAGE = "http://gitpilot.com"
