@@ -5,7 +5,7 @@ require 'date'
 require 'spec/rake/spectask'
 
 GEM = "lookup"
-GEM_VERSION = "0.0.5"
+GEM_VERSION = "0.1.0"
 AUTHOR = "Ryan Bigg"
 EMAIL = "radarlistener@gmail.com"
 HOMEPAGE = "http://gitpilot.com"
@@ -29,7 +29,12 @@ spec = Gem::Specification.new do |s|
   
   s.require_path = 'lib'
   s.autorequire = GEM
-  s.files = %w(LICENSE README.md Rakefile TODO) + Dir.glob("{lib,spec,bin}/**/*")
+  (Dir.entries("doc") - ['..', '.']).each do |file|
+    FileUtils.rm("doc/#{file}")
+  end
+  Dir.delete("doc")
+  Dir.mkdir("doc")
+  s.files = %w(LICENSE README.md Rakefile TODO) + Dir.glob("{lib,spec,bin,doc}/**/*")
 end
 
 task :default => :spec
