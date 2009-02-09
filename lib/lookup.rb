@@ -6,7 +6,9 @@ GEM_SERVER = "http://localhost:8808"
 DOC_PATH = File.join(LIB_DIR, "../doc")
 require File.join(LIB_DIR, "config")
 # Updates blazingly fast now.
+
 def update
+  system("gem server")
   home_page = Hpricot(Net::HTTP.get(URI.parse(GEM_SERVER)))
   home_page.search("a").select { |a| a.inner_html == "[rdoc]"}.each do |a|
     href = a['href'].gsub(/\/index.html/, '')
@@ -69,7 +71,7 @@ def find_constant(name, entry=nil)
   # Find by name beginning with <blah>.
   constants = @classes.select { |c| Regexp.new("^#{name}.*").match(c.first) } if constants.empty?
   # Find by name containing letters of <blah> in order.
-  constants = @classes.select { |c| Regexp.new(name.split("").join(".*")).match(c.first) } if constants.empty?
+  constants = @classes.select { |c| Regexp.new(name.split("").join(".*")).match(c.first).nil? } if constants.empty?
   # puts constants.inspect
   if constants.size > 1
     # Narrow it down to the constants that only contain the entry we are looking for.
@@ -97,7 +99,7 @@ def find_constant(name, entry=nil)
     end
   end
 end
- 
+
 # Find an entry.
 # If the constant argument is passed, look it up within the scope of the constant.
 def find_method(name, constant=nil)
@@ -127,12 +129,12 @@ def find_method(name, constant=nil)
  end
  methods
 end
-   
  
+
 def lookup
   load_files(ARGV[0])
   parts = ARGV[1..-1].map { |a| a.split("#") }.flatten!
-  
+
   # It's a constant! Oh... and there's nothing else in the string!
   if /^[A-Z]/.match(parts.first) && parts.size == 1
    object = find_constant(parts.first)
@@ -154,7 +156,9 @@ def load_files(name)
   @methods = []
   case name
   when "rails"
-    gems = ["actionmailer", "actionpack", "activerecord", "activeresource", "activesupport", "rake"].map { |e| "e*" }
+    # Require all the rails related gems.
+    # We require the ruby docs here because some people have been known to get confused.
+    gems = ["actionmailer", "actionpack", "activerecord", "activeresource", "activesupport", "rake"].map { |e| "e*" } + ["ruby"]
     load_gems(gems)
   when "ruby"
     gems = ["ruby"]
@@ -174,6 +178,7 @@ def load_gems(gems)
   end
 end
 
-
-# update
-lookup
+begin
+  update
+  lookup
+end
