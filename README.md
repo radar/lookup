@@ -9,9 +9,14 @@
  * `lookup ActiveRecord::Base` (returns a single consant)
  * `lookup Acv::Base` (returns six constants, because it does a fuzzy match)
  
- 
+## Options
+
+It also takes options:
+
+* `-c or --clear` will delete the database and update the api again. This can take a minute or two.
 
 ## How it finds them
+
 1. Checks if there's constants/methods with that exact name.
 2. Checks if there's constants/methods with names beginning with that name.
 3. Does a "fuzzy match" splitting the name and getting anything containing those letters in that order.
