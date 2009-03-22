@@ -14,6 +14,7 @@
 It also takes options:
 
 * `-c or --clear` will delete the database and update the api again. This can take a minute or two.
+* `-t or --text` is useful for when you don't want lookup to spam tabs into your browser willy-nilly.
 
 ## How it finds them
 
