@@ -1,6 +1,5 @@
 require 'rubygems'
 require 'activerecord'
-require 'optparse'
 
 MAC = !!/darwin/.match(PLATFORM)
 WINDOWS = !!/win/.match(PLATFORM)
@@ -10,7 +9,7 @@ WINDOWS = !!/win/.match(PLATFORM)
 THRESHOLD = 5
 
 ActiveRecord::Base.establish_connection(:adapter => "sqlite3", :database => File.join(File.dirname(__FILE__), "lookup.sqlite3"))
-class Lookup
+class APILookup
 
   class << self
     def update
@@ -150,40 +149,7 @@ class Lookup
     def display_method(method)
       "(#{method.constant.name}) #{method.name} #{method.url}"
     end
-    
-  
-    def display_constants(constants)
-      count = 0
-      if constants.size == 1
-        constant = constants.first
-        if OPTIONS[:text]
-          puts "#{constant.name} #{constant.url}"
-        elsif MAC && !OPTIONS[:text]
-          `open #{constant.url}`
-        elsif WINDOWS && !OPTIONS[:text]
-          `start #{constant.url}`
-        else
-          puts "#{constant.name} #{constant.url}"
-        end
-
-      elsif constants.size <= THRESHOLD
-        for constant in constants
-          if OPTIONS[:text]
-            puts "#{count+=1}. #{constant.name} #{constant.url}"
-          elsif MAC
-            `open #{constant.url}`
-          elsif WINDOWS
-            `open #{constant.url}`
-          else
-            puts "#{count+=1}. #{constant.name} #{constant.url}"
-          end
-        end
-      else
-        puts "Please refine your query, we found #{constants.size} constants (threshold is #{THRESHOLD})."
-      end
-      return nil
-    end
-  
+      
     def do(msg)
       msg = msg.split(" ")[0..-1].flatten.map { |a| a.split("#") }.flatten!
     
@@ -202,32 +168,7 @@ class Lookup
       end
     end
     
-    def setup
-      file = File.join(File.dirname(__FILE__), "lookup.sqlite3")
-      FileUtils.rm(file) if File.exists?(file) && OPTIONS[:clear]
-    end
   end
 end
 
-OPTIONS = {}
-unless $TESTING
-  OptionParser.new do |opts|
-    opts.banner = "Usage: lookup <constant|method> [method] [OPTIONS]"
-
-    opts.on("-c", "--clear", "Clear database") do
-      OPTIONS[:clear] = true
-    end
-    opts.on("-t", "--text", "Text only") do
-      OPTIONS[:text] = true
-    end
-  end.parse!
-end
-# Ready!
-Lookup.setup
-
-# Set!
 require File.join(File.dirname(__FILE__), 'models')
-
-# Go!
-Lookup.do(ARGV[0..-1])
-  
