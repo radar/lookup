@@ -60,12 +60,25 @@ class APILookup
       # Find by fuzzy.
       match="%#{name.split("").join("%")}%"
       constants = Constant.find_by_sql("select * from constants where name LIKE '#{match}'") if constants.empty?
+      regex=build_regex_from_constant(name)
+      constants = constants.select { |x| x.name =~ regex }
       # Narrow it down to the constants that only contain the entry we are looking for.
       if entry
         constants = constants.select { |constant| !constant.entries.find_by_name(entry).nil? }
       end
       constants
-    end  
+    end
+    
+    # this uses a regex to lock down our SQL finds even more
+    # so that things like AR::Base will not match
+    # ActiveRecord::ConnectionAdapters::DatabaseStatements 
+    def build_regex_from_constant(name)
+      return /.*/
+      parts=name.split("::").map do |c|
+        c.split("").join("[^:]*")+"[^:]*"
+      end
+      /#{parts.join("::")}/i
+    end
     
     def smart_rails_constant_substitutions(name)
       parts=name.split("::")
