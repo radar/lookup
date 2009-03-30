@@ -1,14 +1,25 @@
-class Api < ActiveRecord::Base
-  has_many :constants
-end
+class APILookup
 
-class Constant < ActiveRecord::Base
-  belongs_to :api
-  has_many :entries
-end
+  class LookupBase < ActiveRecord::Base
+  end
+  LookupBase.establish_connection(:adapter => "sqlite3", :database => File.join(File.dirname(__FILE__), "lookup.sqlite3"))
 
-class Entry < ActiveRecord::Base
-  belongs_to :constant
+  class Api < LookupBase
+    set_table_name "apis"
+    has_many :constants
+  end
+
+  class Constant < LookupBase
+    set_table_name "constants"
+    belongs_to :api
+    has_many :entries
+  end
+
+  class Entry < LookupBase
+    set_table_name "entries"
+    belongs_to :constant
+  end
+
 end
 
 class SetupTables < ActiveRecord::Migration
@@ -21,17 +32,21 @@ class SetupTables < ActiveRecord::Migration
       t.string :name, :url
       t.references :constant
       t.integer :weighting, :default => 0
+      t.integer :count, :default => 0
     end
     
     create_table :constants do |t|
       t.string :name, :url
       t.references :api
       t.integer :weighting, :default => 0
+      t.integer :count, :default => 0
     end
   end
 end
 
-if !Api.table_exists? && !Constant.table_exists? && !Entry.table_exists?
+if !APILookup::Api.table_exists? && 
+   !APILookup::Constant.table_exists? && 
+   !APILookup::Entry.table_exists?
   SetupTables.up
-  Lookup.update
+  APILookup.update
 end

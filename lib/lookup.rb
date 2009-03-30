@@ -1,7 +1,6 @@
 require 'rubygems'
 require 'activerecord'
 
-ActiveRecord::Base.establish_connection(:adapter => "sqlite3", :database => File.join(File.dirname(__FILE__), "lookup.sqlite3"))
 class APILookup
 
   class << self
