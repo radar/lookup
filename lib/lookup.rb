@@ -59,45 +59,17 @@ class APILookup
       constants = Constant.all(:conditions => ["name LIKE ?", name + "%"], :include => "entries") if constants.empty?
       # Find by fuzzy.
       constants = Constant.find_by_sql("select * from constants where name LIKE '%#{name.split("").join("%")}%'") if constants.empty?
-      if constants.size > 1
-        # Narrow it down to the constants that only contain the entry we are looking for.
-        if !entry.nil?
-          constants = constants.select { |constant| !constant.entries.find_by_name(entry).nil? }
-          return [constants, constants.size]
-        else
-          display_results(constants)
-        end
-        if constants.size == 1
-          if entry.nil?
-            display_results(constants)
-          else
-            return [[constants.first], 1]
-          end
-        elsif constants.size == 0
-          if entry
-            puts "There are no constants that match #{name} and contain #{entry}."
-          else
-            puts "There are no constants that match #{name}"
-          end
-        else
-          return [constants, constants.size]
-        end
-      else
-        if entry.nil?
-         display_results(constants)
-        else
-          return [[constants.first], 1]
-        end
+      # Narrow it down to the constants that only contain the entry we are looking for.
+      if entry
+        constants = constants.select { |constant| !constant.entries.find_by_name(entry).nil? }
       end
+      constants
     end  
   
     # Find an entry.
     # If the constant argument is passed, look it up within the scope of the constant.
     def find_method(name, constant=nil)
-      if constant
-        constants, number = find_constant(constant, name)
-      end
-      methods = [] 
+      methods = []
       methods = Entry.find_all_by_name(name.to_s)
       methods = Entry.all(:conditions => ["name LIKE ?", name.to_s + "%"]) if methods.empty?
       methods = Entry.find_by_sql("select * from entries where name LIKE '%#{name.split("").join("%")}%'") if methods.empty?
@@ -106,6 +78,7 @@ class APILookup
       methods = methods.sort_by(&:weighting)
     
       if constant
+        constants = find_constant(constant, name)
         methods = methods.select { |m| constants.include?(m.constant) }
       end
       methods      

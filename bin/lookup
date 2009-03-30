@@ -27,7 +27,14 @@ def display_url(result, options={})
 end
 
 def display_results(results)
-  if results.size == 1
+  if results.empty?
+    puts "There were no results matching #{name}."
+    # if entry
+    #   puts "There are no constants that match #{name} and contain #{entry}."
+    # else
+    #   puts "There are no constants that match #{name}"
+    # end
+  elsif results.size == 1
     display_url(results.first)
   elsif results.size <= THRESHOLD
     results.each_with_index do |result, i|
