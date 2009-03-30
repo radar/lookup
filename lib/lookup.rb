@@ -20,11 +20,11 @@ class APILookup
     end
   
     def update_api(name, url)
-      puts "Updating API for #{name}"
+      puts "Updating API for #{name}..."
       Api.find_or_create_by_name_and_url(name, url)
       update_methods(Hpricot(Net::HTTP.get(URI.parse("#{url}/fr_method_index.html"))), url)
       update_classes(Hpricot(Net::HTTP.get(URI.parse("#{url}/fr_class_index.html"))), url)
-      puts "Updated API for #{name}!"
+      puts "DONE (with #{name})!"
     end
   
     def update_methods(doc, prefix)
