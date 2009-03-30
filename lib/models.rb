@@ -1,8 +1,20 @@
+require 'fileutils'
+
 class APILookup
+
+  class MissingHome < StandardError
+  end
 
   class LookupBase < ActiveRecord::Base
   end
-  LookupBase.establish_connection(:adapter => "sqlite3", :database => File.join(File.dirname(__FILE__), "lookup.sqlite3"))
+  if ENV["HOME"].nil?
+    puts "The HOME environment variable should be set so lookup knows where"
+    puts "to store it's lookup database."
+    raise MissingHome, "HOME must be set to know where to store our local db."
+  end
+
+  LookupBase.establish_connection(:adapter => "sqlite3", 
+    :database => File.join(ENV["HOME"],".lookup", "lookup.sqlite3"))
 
   class Api < LookupBase
     set_table_name "apis"
@@ -23,6 +35,10 @@ class APILookup
 end
 
 class SetupTables < ActiveRecord::Migration
+  def self.connection
+    APILookup::Api.connection
+  end
+
   def self.up
     create_table :apis do |t|
       t.string :name, :url
@@ -43,6 +59,8 @@ class SetupTables < ActiveRecord::Migration
     end
   end
 end
+
+FileUtils.mkdir_p(File.join(ENV["HOME"],".lookup"))
 
 if !APILookup::Api.table_exists? && 
    !APILookup::Constant.table_exists? && 
