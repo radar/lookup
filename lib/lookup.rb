@@ -55,6 +55,8 @@ class APILookup
     def find_constant(name, entry=nil)
       # Find by specific name.
       constants = Constant.find_all_by_name(name, :include => "entries")
+      # search for class methods, which is prolly what we want if we can find it
+      constants = Constant.find_all_by_name("#{name}::ClassMethods", :include => "entries") if constants.empty?
       # Find by name beginning with <blah>.
       constants = Constant.all(:conditions => ["name LIKE ?", name + "%"], :include => "entries") if constants.empty?
       # Find by fuzzy.
@@ -80,7 +82,7 @@ class APILookup
     end
     
     def smart_rails_constant_substitutions(name)
-      parts=name.split("::")
+      parts=name.split("::").map { |x| x.split(":")}.flatten
       rep = case parts.first.downcase
         # so it falls back on fuzzy and matches AR as well as ActiveResource
         when "ar": "ActiveRe" 
