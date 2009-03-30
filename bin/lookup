@@ -60,4 +60,5 @@ rescue LoadError
   require File.join(File.dirname(__FILE__), "../lib/lookup")
 end
 
-APILookup.do(ARGV[0..-1])
+results=APILookup.search(ARGV[0..-1])
+display_results(results)

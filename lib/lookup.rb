@@ -108,33 +108,23 @@ class APILookup
       if constant
         methods = methods.select { |m| constants.include?(m.constant) }
       end
-      count = 0
-      if methods.size == 1
-        display_url(method.first)
-      elsif methods.size <= THRESHOLD
-        methods.each_with_index do | method, i |
-          display_url(method, :number => i)
-        end
-        methods
-      else
-        puts "Please refine your query, we found #{methods.size} methods. Threshold is #{THRESHOLD}."
-      end
+      methods      
     end
           
-    def do(msg)
+    def search(msg)
       msg = msg.split(" ")[0..-1].flatten.map { |a| a.split("#") }.flatten!
     
       # It's a constant! Oh... and there's nothing else in the string!
       if /^[A-Z]/.match(msg.first) && msg.size == 1
-       object = find_constant(msg.first)
+       find_constant(msg.first)
        # It's a method!
       else
         # Right, so they only specified one argument. Therefore, we look everywhere.
-        if msg.first == msg.last
-          object = find_method(msg)
+        if msg.size == 1
+          find_method(msg)
         # Left, so they specified two arguments. First is probably a constant, so let's find that!
         else
-          object = find_method(msg.last, msg.first)
+          find_method(msg.last, msg.first)
         end  
       end
     end
