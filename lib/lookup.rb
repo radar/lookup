@@ -1,13 +1,6 @@
 require 'rubygems'
 require 'activerecord'
 
-MAC = !!/darwin/.match(PLATFORM)
-WINDOWS = !!/win/.match(PLATFORM)
-
-
-# How many methods / constants to return.
-THRESHOLD = 5
-
 ActiveRecord::Base.establish_connection(:adapter => "sqlite3", :database => File.join(File.dirname(__FILE__), "lookup.sqlite3"))
 class APILookup
 
@@ -72,11 +65,11 @@ class APILookup
           constants = constants.select { |constant| !constant.entries.find_by_name(entry).nil? }
           return [constants, constants.size]
         else
-          display_constants(constants)
+          display_results(constants)
         end
         if constants.size == 1
           if entry.nil?
-            display_constants(constants)
+            display_results(constants)
           else
             return [[constants.first], 1]
           end
@@ -91,7 +84,7 @@ class APILookup
         end
       else
         if entry.nil?
-         display_constants(constants)
+         display_results(constants)
         else
           return [[constants.first], 1]
         end

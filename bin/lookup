@@ -1,57 +1,52 @@
 #!/usr/bin/ruby
 require 'optparse'
 
+# How many methods / constants to return.
+THRESHOLD = 10
+MAC = !!/darwin/.match(PLATFORM)
+WINDOWS = !!/win/.match(PLATFORM) if not MAC
+
 def clear_database
   file = File.join(File.dirname(__FILE__), "lookup.sqlite3")
   FileUtils.rm(file) if File.exists?(file) 
 end
 
-def display_constants(constants)
-  count = 0
-  if constants.size == 1
-    constant = constants.first
-    if OPTIONS[:text]
-      puts "#{constant.name} #{constant.url}"
-    elsif MAC && !OPTIONS[:text]
-      `open #{constant.url}`
-    elsif WINDOWS && !OPTIONS[:text]
-      `start #{constant.url}`
-    else
-      puts "#{constant.name} #{constant.url}"
-    end
+def display_url(constant, options={})
+  s = options[:number] ? options[:number].to_s + ". " : ""
+  s += "#{constant.name} #{constant.url}"
+  # if we're not on mac or windows we default to text output
+  if OPTIONS[:text] or not (MAC || WINDOWS)
+    puts s
+  elsif MAC 
+    `open #{constant.url}`
+  elsif WINDOWS 
+    `start #{constant.url}`
+  end
+end
 
-  elsif constants.size <= THRESHOLD
-    for constant in constants
-      if OPTIONS[:text]
-        puts "#{count+=1}. #{constant.name} #{constant.url}"
-      elsif MAC
-        `open #{constant.url}`
-      elsif WINDOWS
-        `open #{constant.url}`
-      else
-        puts "#{count+=1}. #{constant.name} #{constant.url}"
-      end
+def display_results(results)
+  if results.size == 1
+    display_url(results.first)
+  elsif results.size <= THRESHOLD
+    results.each_with_index do |result, i|
+      display_url(result, :number => i+1)
     end
   else
-    puts "Please refine your query, we found #{constants.size} constants (threshold is #{THRESHOLD})."
+    puts "Please refine your query, we found #{results.size} results (threshold is #{THRESHOLD})."
   end
-  return nil
 end
-
 
 OPTIONS = {}
-unless $TESTING
-  OptionParser.new do |opts|
-    opts.banner = "Usage: lookup <constant|method> [method] [OPTIONS]"
+OptionParser.new do |opts|
+  opts.banner = "Usage: lookup <constant|method> [method] [OPTIONS]"
 
-    opts.on("-c", "--clear", "Clear database") do
-      OPTIONS[:clear] = true
-    end
-    opts.on("-t", "--text", "Text only") do
-      OPTIONS[:text] = true
-    end
-  end.parse!
-end
+  opts.on("-c", "--clear", "Clear database") do
+    OPTIONS[:clear] = true
+  end
+  opts.on("-t", "--text", "Text only") do
+    OPTIONS[:text] = true
+  end
+end.parse!
 
 clear_database if OPTIONS[:clear]
 
