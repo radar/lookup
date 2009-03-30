@@ -73,7 +73,6 @@ class APILookup
     # so that things like AR::Base will not match
     # ActiveRecord::ConnectionAdapters::DatabaseStatements 
     def build_regex_from_constant(name)
-      return /.*/
       parts=name.split("::").map do |c|
         c.split("").join("[^:]*")+"[^:]*"
       end
