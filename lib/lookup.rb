@@ -110,39 +110,17 @@ class APILookup
       end
       count = 0
       if methods.size == 1
-        method = methods.first
-        if OPTIONS[:text]
-          puts display_method(method)
-        elsif MAC
-          `open #{method.url}`
-        elsif WINDOWS
-          `start #{method.url}`
-        else
-          puts display_method(method)
-        end
+        display_url(method.first)
       elsif methods.size <= THRESHOLD
-        for method in methods
-          if OPTIONS[:text]
-            puts "#{count += 1}. #{display_method(method)}"
-          elsif MAC
-            `open #{method.url}`
-          elsif WINDOWS 
-            `start #{method.url}`
-          else
-            puts "#{count += 1}. #{display_method(method)}"
-          end
+        methods.each_with_index do | method, i |
+          display_url(method, :number => i)
         end
         methods
       else
         puts "Please refine your query, we found #{methods.size} methods. Threshold is #{THRESHOLD}."
       end
-      return nil
     end
-    
-    def display_method(method)
-      "(#{method.constant.name}) #{method.name} #{method.url}"
-    end
-      
+          
     def do(msg)
       msg = msg.split(" ")[0..-1].flatten.map { |a| a.split("#") }.flatten!
     

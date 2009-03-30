@@ -2,7 +2,7 @@
 require 'optparse'
 
 # How many methods / constants to return.
-THRESHOLD = 10
+THRESHOLD = 11
 MAC = !!/darwin/.match(PLATFORM)
 WINDOWS = !!/win/.match(PLATFORM) if not MAC
 
@@ -11,16 +11,18 @@ def clear_database
   FileUtils.rm(file) if File.exists?(file) 
 end
 
-def display_url(constant, options={})
-  s = options[:number] ? options[:number].to_s + ". " : ""
-  s += "#{constant.name} #{constant.url}"
+def display_url(result, options={})
   # if we're not on mac or windows we default to text output
   if OPTIONS[:text] or not (MAC || WINDOWS)
+    s = options[:number] ? options[:number].to_s + ". " : ""
+    # if we're a method then show the constant in parans
+    s += "(#{result.constant.name}) " if result.respond_to?(:constant)
+    s += "#{result.name} #{result.url}"
     puts s
   elsif MAC 
-    `open #{constant.url}`
+    `open #{result.url}`
   elsif WINDOWS 
-    `start #{constant.url}`
+    `start #{result.url}`
   end
 end
 
