@@ -59,12 +59,13 @@ end.parse!
 
 clear_database if OPTIONS[:clear]
 
-require 'rubygems'
-begin
+
+local_lib=File.join(File.dirname(__FILE__), "../lib/lookup")
+if File.exists?(local_lib + ".rb")
+  require local_lib
+else
+  require 'rubygems'
   require 'lookup' 
-# so we can run the bin while developing
-rescue LoadError 
-  require File.join(File.dirname(__FILE__), "../lib/lookup")
 end
 
 search_string=ARGV[0..-1].join(" ")
