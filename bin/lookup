@@ -26,9 +26,9 @@ def display_url(result, options={})
   end
 end
 
-def display_results(results)
+def display_results(results, search_string)
   if results.empty?
-    puts "There were no results matching #{name}."
+    puts "There were no results matching #{search_string}."
     # if entry
     #   puts "There are no constants that match #{name} and contain #{entry}."
     # else
@@ -67,5 +67,6 @@ rescue LoadError
   require File.join(File.dirname(__FILE__), "../lib/lookup")
 end
 
+search_string=ARGV[0..-1].join(" ")
 results=APILookup.search(ARGV[0..-1])
-display_results(results)
+display_results(results, search_string)
