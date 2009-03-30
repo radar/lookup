@@ -2,7 +2,7 @@
 require 'optparse'
 
 # How many methods / constants to return.
-THRESHOLD = 11
+THRESHOLD = 5
 MAC = !!/darwin/.match(PLATFORM)
 WINDOWS = !!/win/.match(PLATFORM) if not MAC
 
@@ -46,7 +46,7 @@ def display_results(results, search_string)
 end
 
 OPTIONS = {}
-OptionParser.new do |opts|
+op=OptionParser.new do |opts|
   opts.banner = "Usage: lookup <constant|method> [method] [OPTIONS]"
 
   opts.on("-c", "--clear", "Clear database") do
@@ -55,7 +55,8 @@ OptionParser.new do |opts|
   opts.on("-t", "--text", "Text only") do
     OPTIONS[:text] = true
   end
-end.parse!
+end
+op.parse!
 
 clear_database if OPTIONS[:clear]
 
@@ -69,5 +70,10 @@ else
 end
 
 search_string=ARGV[0..-1].join(" ")
-results=APILookup.search(ARGV[0..-1])
-display_results(results, search_string)
+if search_string.strip.empty?
+  puts op.help
+  puts
+else
+  results=APILookup.search(ARGV[0..-1])
+  display_results(results, search_string)
+end
