@@ -58,13 +58,29 @@ class APILookup
       # Find by name beginning with <blah>.
       constants = Constant.all(:conditions => ["name LIKE ?", name + "%"], :include => "entries") if constants.empty?
       # Find by fuzzy.
-      constants = Constant.find_by_sql("select * from constants where name LIKE '%#{name.split("").join("%")}%'") if constants.empty?
+      match="%#{name.split("").join("%")}%"
+      constants = Constant.find_by_sql("select * from constants where name LIKE '#{match}'") if constants.empty?
       # Narrow it down to the constants that only contain the entry we are looking for.
       if entry
         constants = constants.select { |constant| !constant.entries.find_by_name(entry).nil? }
       end
       constants
     end  
+    
+    def smart_rails_constant_substitutions(name)
+      parts=name.split("::")
+      rep = case parts.first.downcase
+        # so it falls back on fuzzy and matches AR as well as ActiveResource
+        when "ar": "ActiveRe" 
+        when "am": "ActionMailer"
+        when "as": "ActiveSupport"
+        when "ac": "ActionController"
+        when "av": "ActionView"
+        else 
+          parts.first
+      end
+      ([rep] + parts[1..-1]).join("::")
+    end
   
     # Find an entry.
     # If the constant argument is passed, look it up within the scope of the constant.
@@ -88,8 +104,9 @@ class APILookup
       msg = msg.split(" ")[0..-1].flatten.map { |a| a.split("#") }.flatten!
     
       # It's a constant! Oh... and there's nothing else in the string!
-      if /^[A-Z]/.match(msg.first) && msg.size == 1
-       find_constant(msg.first)
+      first=smart_rails_constant_substitutions(msg.first)
+      if /^[A-Z]/.match(first) && msg.size == 1
+       find_constant(first)
        # It's a method!
       else
         # Right, so they only specified one argument. Therefore, we look everywhere.
