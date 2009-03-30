@@ -114,7 +114,7 @@ class APILookup
           find_method(msg)
         # Left, so they specified two arguments. First is probably a constant, so let's find that!
         else
-          find_method(msg.last, msg.first)
+          find_method(msg.last, first)
         end  
       end
     end
