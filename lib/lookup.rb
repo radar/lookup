@@ -102,7 +102,7 @@ class APILookup
       methods = []
       methods = Entry.find_all_by_name(name.to_s)
       methods = Entry.all(:conditions => ["name LIKE ?", name.to_s + "%"]) if methods.empty?
-      methods = Entry.find_by_sql("select * from entries where name LIKE '%#{name.split("").join("%")}%'") if methods.empty?
+      methods = Entry.find_by_sql("select * from entries where name LIKE '%#{name.to_s.split("").join("%")}%'") if methods.empty?
       
       # Weight the results, last result is the first one we want shown first
       methods = methods.sort_by(&:weighting)
