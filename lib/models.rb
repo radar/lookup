@@ -12,7 +12,7 @@ class APILookup
     puts "to store it's lookup database."
     raise MissingHome, "HOME must be set to know where to store our local db."
   end
-
+ 
   LookupBase.establish_connection(:adapter => "sqlite3", 
     :database => File.join(ENV["HOME"],".lookup", "lookup.sqlite3"))
 

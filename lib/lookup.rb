@@ -102,13 +102,14 @@ class APILookup
       methods = []
       methods = Entry.find_all_by_name(name.to_s)
       methods = Entry.all(:conditions => ["name LIKE ?", name.to_s + "%"]) if methods.empty?
+      methods = Entry.find_by_sql("select * from entries where name LIKE '#{name.to_s.gsub("*", "%")}'") if methods.empty?
       methods = Entry.find_by_sql("select * from entries where name LIKE '%#{name.to_s.split("").join("%")}%'") if methods.empty?
       
       # Weight the results, last result is the first one we want shown first
       methods = methods.sort_by(&:weighting)
     
       if constant
-        constants = find_constant(constant, name)
+        constants = find_constant(constant)
         methods = methods.select { |m| constants.include?(m.constant) }
       end
       methods      
@@ -118,7 +119,7 @@ class APILookup
       msg = msg.split(" ")[0..-1].flatten.map { |a| a.split("#") }.flatten!
     
       # It's a constant! Oh... and there's nothing else in the string!
-      first=smart_rails_constant_substitutions(msg.first)
+      first = smart_rails_constant_substitutions(msg.first)
       if /^[A-Z]/.match(first) && msg.size == 1
        find_constant(first)
        # It's a method!

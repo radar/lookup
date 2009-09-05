@@ -1,29 +1,36 @@
 require File.dirname(__FILE__) + '/spec_helper'
 
 describe "Lookup" do
+  
+  def find_constant(name)
+    APILookup::Constant.find_by_name(name)
+  end
+  
+  def find_entry(constant, name)
+    APILookup::Entry.find_by_name_and_constant_id(name, find_constant(constant).id)
+  end
+  
   before do
-    # So it outputs text for us.
-    OPTIONS.merge!({ :text => true })
   end
   
   it "should be able to find a constant" do
-    Lookup.do("ActiveRecord::Base")
+    APILookup.search("ActiveRecord::Base").should eql([find_constant("ActiveRecord::Base")])
   end
   
   it "should be able to find a constant and a method (using hash symbol)" do
-    Lookup.do("ActiveRecord::Base#new")
+    APILookup.search("ActiveRecord::Base#new").should eql([find_entry("ActiveRecord::Base", "new")])
   end
   
-  it "should be able to find a constant and a method (using space)" do
-    Lookup.do("ActiveRecord::Base new")
+  it "should be able to find a constant and a method (using spaces)" do
+     APILookup.search("ActiveRecord::Base new").should eql(find_entry("ActiveRecord::Base", "new"))
+   end
+  
+  it "should be able to find a constant and a method (specified wildcard)" do
+     APILookup.search("ActiveRecord::Base#n*w").should eql(find_entry("ActiveRecord::Base", "new"))
   end
   
-  it "should be able to do a fuzzy match on the method" do
-    Lookup.do("ActiveRecord::Base#destry")
-  end
-  
-  it "should prompt the user to be more specific" do
-    Lookup.do("be")
+  it "should be able to find a constant and a method (fuzzy)" do
+     APILookup.search("ActiveRecord::Base#nw").should eql([find_entry("ActiveRecord::Base", "new"), find_entry("ActiveRecord::Base", "new_record?")])
   end
   
   it "should be able to do a fuzzy match on the constant and method" do

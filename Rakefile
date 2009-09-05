@@ -29,11 +29,6 @@ spec = Gem::Specification.new do |s|
   
   s.require_path = 'lib'
   s.autorequire = GEM
-  (Dir.entries("doc") - ['..', '.']).each do |file|
-    FileUtils.rm("doc/#{file}")
-  end
-  Dir.delete("doc")
-  Dir.mkdir("doc")
   s.files = %w(LICENSE README.md Rakefile TODO) + Dir.glob("{lib,spec,bin,doc}/**/*")
 end
 
