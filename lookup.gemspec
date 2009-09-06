@@ -2,7 +2,7 @@
 
 Gem::Specification.new do |s|
   s.name = %q{lookup}
-  s.version = "0.2.0"
+  s.version = "0.2.1"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Ryan Bigg"]
@@ -21,13 +21,11 @@ Gem::Specification.new do |s|
     "lib/config.rb", 
     "lib/lookup.rb", 
     "lib/models.rb", 
-    "spec/lookup_spec.rb", 
-    "spec/spec_helper.rb", 
     "bin/lookup"]
   s.has_rdoc = true
-  s.homepage = %q{http://gitpilot.com}
+  s.homepage = %q{http://frozenplague.net}
   s.require_paths = ["lib"]
-  s.rubygems_version = %q{1.3.1}
+  s.rubygems_version = %q{1.3.5}
   s.summary = %q{A gem that provides a lazy man's ri}
 
   if s.respond_to? :specification_version then

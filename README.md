@@ -7,7 +7,7 @@
  * `lookup ActiveRecord::Base#destro` (returns three methods, uses methods beginning with "destroy")
  * `lookup ActiveRecord::Base#d` (tells you to be more specific, because it can't open 35 tabs at once)
  * `lookup ActiveRecord::Base` (returns a single consant)
- * `lookup Acv::Base` (returns six constants, because it does a fuzzy match)
+ * `lookup av::Base` ("av" maps to ActionView, so returns ActionView::Base constant)
  
 ## Options
 

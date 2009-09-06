@@ -100,9 +100,13 @@ class APILookup
     # If the constant argument is passed, look it up within the scope of the constant.
     def find_method(name, constant=nil)
       methods = []
+      # Full match
       methods = Entry.find_all_by_name(name.to_s)
+      # Start match
       methods = Entry.all(:conditions => ["name LIKE ?", name.to_s + "%"]) if methods.empty?
+      # Wildcard substitution
       methods = Entry.find_by_sql("select * from entries where name LIKE '#{name.to_s.gsub("*", "%")}'") if methods.empty?
+      # Fuzzy match
       methods = Entry.find_by_sql("select * from entries where name LIKE '%#{name.to_s.split("").join("%")}%'") if methods.empty?
       
       # Weight the results, last result is the first one we want shown first
