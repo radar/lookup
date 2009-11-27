@@ -99,7 +99,6 @@ class APILookup
     # Find an entry.
     # If the constant argument is passed, look it up within the scope of the constant.
     def find_method(name, constant=nil)
-      name = name.first if name.is_a?(Array)
       methods = []
       # Full match
       methods = Entry.find_all_by_name(name.to_s)
