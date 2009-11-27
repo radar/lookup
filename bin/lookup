@@ -3,8 +3,8 @@ require 'optparse'
 
 # How many methods / constants to return.
 THRESHOLD = 5
-MAC = !!/darwin/.match(PLATFORM)
-WINDOWS = !!/win/.match(PLATFORM) if not MAC
+MAC = !!/darwin/.match(RUBY_PLATFORM)
+WINDOWS = !!/win/.match(RUBY_PLATFORM) if not MAC
 
 def clear_database
   file = File.join(File.dirname(__FILE__), "lookup.sqlite3")

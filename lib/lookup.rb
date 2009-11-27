@@ -84,12 +84,12 @@ class APILookup
       parts=name.split("::").map { |x| x.split(":")}.flatten
       rep = case parts.first.downcase
         # so it falls back on fuzzy and matches AR as well as ActiveResource
-        when "ar": "ActiveRecord" 
-        when "ares": "ActiveResource" 
-        when "am": "ActionMailer"
-        when "as": "ActiveSupport"
-        when "ac": "ActionController"
-        when "av": "ActionView"
+        when "ar" then "ActiveRecord" 
+        when "ares" then "ActiveResource" 
+        when "am" then "ActionMailer"
+        when "as" then "ActiveSupport"
+        when "ac" then "ActionController"
+        when "av" then "ActionView"
         else 
           parts.first
       end
