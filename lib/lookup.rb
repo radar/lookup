@@ -1,5 +1,5 @@
 require 'rubygems'
-require 'activerecord'
+require 'active_record'
 
 class APILookup
 
@@ -99,6 +99,7 @@ class APILookup
     # Find an entry.
     # If the constant argument is passed, look it up within the scope of the constant.
     def find_method(name, constant=nil)
+      name = name.first if name.is_a?(Array)
       methods = []
       # Full match
       methods = Entry.find_all_by_name(name.to_s)
@@ -116,7 +117,7 @@ class APILookup
         constants = find_constant(constant)
         methods = methods.select { |m| constants.include?(m.constant) }
       end
-      methods      
+      methods
     end
           
     def search(msg)
@@ -130,7 +131,7 @@ class APILookup
       else
         # Right, so they only specified one argument. Therefore, we look everywhere.
         if msg.size == 1
-          find_method(msg)
+          find_method(msg.last)
         # Left, so they specified two arguments. First is probably a constant, so let's find that!
         else
           find_method(msg.last, first)
