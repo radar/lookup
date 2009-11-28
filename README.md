@@ -1,5 +1,16 @@
 # Lazy Man's ri (lookup)
 
+## Installation
+
+Add gemcutter as a source:
+   
+    sudo gem install gemcutter
+    gem tumble
+    
+Then you'll be able to:
+
+    sudo gem install lookup
+
 ## Example usage:
 
  * `lookup ActiveRecord::Base#new` (returns a single method, since the method name is right)

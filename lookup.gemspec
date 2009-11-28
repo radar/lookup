@@ -7,6 +7,7 @@ Gem::Specification.new do |s|
   s.authors = ["Ryan Bigg"]
   s.autorequire = %q{lookup}
   s.date = %q{2009-03-30}
+  s.add_dependency('sqlite3-ruby', '>= 1.2.5')
   s.default_executable = %q{lookup}
   s.description = %q{A gem that provides a lazy man's ri}
   s.email = %q{radarlistener@gmail.com}
