@@ -1,8 +1,10 @@
 require 'rubygems'
 require 'rake/gempackagetask'
 require 'rubygems/specification'
-require 'date'
 require 'spec/rake/spectask'
+
+require 'jeweler'
+Jeweler::GemcutterTasks.new
 
 GEM = "lookup"
 GEM_VERSION = "0.1.0"
@@ -11,8 +13,9 @@ EMAIL = "radarlistener@gmail.com"
 HOMEPAGE = "http://gitpilot.com"
 SUMMARY = "A gem that provides a lazy man's ri"
 
-spec = Gem::Specification.new do |s|
+Jeweler::Tasks.new do |s|
   s.name = GEM
+  s.add_dependency("sqlite3-ruby", "1.2.5")
   s.version = GEM_VERSION
   s.platform = Gem::Platform::RUBY
   s.has_rdoc = true
@@ -30,29 +33,4 @@ spec = Gem::Specification.new do |s|
   s.require_path = 'lib'
   s.autorequire = GEM
   s.files = %w(LICENSE README.md Rakefile TODO) + Dir.glob("{lib,spec,bin,doc}/**/*")
-end
-
-task :default => :spec
-
-desc "Run specs"
-Spec::Rake::SpecTask.new do |t|
-  t.spec_files = FileList['spec/**/*_spec.rb']
-  t.spec_opts = %w(-fs --color)
-end
-
-
-Rake::GemPackageTask.new(spec) do |pkg|
-  pkg.gem_spec = spec
-end
-
-desc "install the gem locally"
-task :install => [:package] do
-  sh %{sudo gem install pkg/#{GEM}-#{GEM_VERSION}}
-end
-
-desc "create a gemspec file"
-task :make_spec do
-  File.open("#{GEM}.gemspec", "w") do |file|
-    file.puts spec.to_ruby
-  end
 end
