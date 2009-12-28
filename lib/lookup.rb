@@ -81,19 +81,22 @@ class APILookup
     end
     
     def smart_rails_constant_substitutions(name)
-      parts=name.split("::").map { |x| x.split(":")}.flatten
-      rep = case parts.first.downcase
-        # so it falls back on fuzzy and matches AR as well as ActiveResource
-        when "ar" then "ActiveRecord" 
-        when "ares" then "ActiveResource" 
-        when "am" then "ActionMailer"
-        when "as" then "ActiveSupport"
-        when "ac" then "ActionController"
-        when "av" then "ActionView"
-        else 
-          parts.first
+      parts = name.split("::").map { |x| x.split(":")}.flatten
+      if parts.first
+        rep = case parts.first.downcase
+          # so it falls back on fuzzy and matches AR as well as ActiveResource
+          when "ar" then "ActiveRecord" 
+          when "ares" then "ActiveResource" 
+          when "am" then "ActionMailer"
+          when "as" then "ActiveSupport"
+          when "ac" then "ActionController"
+          when "av" then "ActionView"
+          else 
+            parts.first
+        end
+        return ([rep] + parts[1..-1]).join("::")
       end
-      ([rep] + parts[1..-1]).join("::")
+      name
     end
   
     # Find an entry.

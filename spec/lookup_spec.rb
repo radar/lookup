@@ -41,4 +41,12 @@ describe "Lookup" do
     APILookup.search("ar::base#new").should eql([find_entry("ActiveRecord::Base", "new")])
   end
   
+  it "should be able to find it if a hash-symbol is specified" do
+    APILookup.search("#today?").should eql([
+                                            find_entry("ActiveSupport::CoreExtensions::Date::Calculations", "today?"),
+                                            find_entry("ActiveSupport::TimeWithZone", "today?"),
+                                            find_entry("ActiveSupport::CoreExtensions::Time::Calculations", "today?")
+                                           ])
+  end
+  
 end

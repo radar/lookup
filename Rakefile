@@ -4,8 +4,6 @@ require 'rubygems/specification'
 require 'spec/rake/spectask'
 
 require 'jeweler'
-Jeweler::GemcutterTasks.new
-
 AUTHOR = "Ryan Bigg"
 EMAIL = "radarlistener@gmail.com"
 HOMEPAGE = "http://gitpilot.com"
@@ -28,4 +26,24 @@ Jeweler::Tasks.new do |s|
   s.require_path = 'lib'
   s.autorequire = "lookup"
   s.files = %w(LICENSE README.md Rakefile TODO) + Dir.glob("{lib,spec,bin,doc}/**/*")
+end
+Jeweler::GemcutterTasks.new
+
+begin
+  require 'spec'
+rescue LoadError
+  require 'rubygems'
+  require 'spec'
+end
+
+require 'spec/rake/spectask'
+desc 'Default: run unit tests.'
+task :default => :spec
+
+desc "Run the specs under spec"
+Spec::Rake::SpecTask.new do |t|
+  t.spec_files = FileList['spec/**/*_spec.rb']
+  t.libs = %w(lib spec)
+  t.spec_opts << "-c"
+  t.ruby_opts << "-rubygems"
 end
