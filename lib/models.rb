@@ -1,6 +1,6 @@
 require 'fileutils'
 
-class APILookup
+module APILookup
 
   class MissingHome < StandardError
   end
@@ -18,18 +18,18 @@ class APILookup
 
   class Api < LookupBase
     set_table_name "apis"
-    has_many :constants
+    has_many :constants, :class_name => "APILookup::Constant"
   end
 
   class Constant < LookupBase
     set_table_name "constants"
-    belongs_to :api
-    has_many :entries
+    belongs_to :api, :class_name => "APILookup::Api"
+    has_many :entries, :class_name => "APILookup::Entry"
   end
-
+  
   class Entry < LookupBase
     set_table_name "entries"
-    belongs_to :constant
+    belongs_to :constant, :class_name => "APILookup::Constant"
   end
 
 end

@@ -5,12 +5,12 @@
 
 Gem::Specification.new do |s|
   s.name = %q{lookup}
-  s.version = "0.2.2"
+  s.version = "0.3.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Ryan Bigg"]
   s.autorequire = %q{lookup}
-  s.date = %q{2009-11-28}
+  s.date = %q{2009-12-28}
   s.description = %q{A gem that provides a lazy man's ri}
   s.email = %q{radarlistener@gmail.com}
   s.executables = ["lookup", "lookup"]
@@ -31,6 +31,7 @@ Gem::Specification.new do |s|
      "lib/methods",
      "lib/models.rb",
      "spec/lookup_spec.rb",
+     "spec/regressions_spec.rb",
      "spec/spec_helper.rb"
   ]
   s.homepage = %q{http://gitpilot.com}
@@ -40,6 +41,7 @@ Gem::Specification.new do |s|
   s.summary = %q{A gem that provides a lazy man's ri}
   s.test_files = [
     "spec/lookup_spec.rb",
+     "spec/regressions_spec.rb",
      "spec/spec_helper.rb"
   ]
 

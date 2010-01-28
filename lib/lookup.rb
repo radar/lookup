@@ -1,7 +1,8 @@
 require 'rubygems'
 require 'active_record'
 
-class APILookup
+require File.join(File.dirname(__FILE__), 'models')
+module APILookup
 
   class << self
     def update
@@ -143,5 +144,3 @@ class APILookup
     
   end
 end
-
-require File.join(File.dirname(__FILE__), 'models')
