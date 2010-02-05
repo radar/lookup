@@ -22,6 +22,7 @@ Jeweler::Tasks.new do |s|
   s.executables << "lookup"
 
   s.add_dependency("sqlite3-ruby", "1.2.5")
+  s.add_dependency("hpricot", "0.8.1")
   
   s.require_path = 'lib'
   s.autorequire = "lookup"
