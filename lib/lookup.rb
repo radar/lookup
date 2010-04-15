@@ -122,23 +122,26 @@ module APILookup
       methods
     end
           
-    def search(msg)
-      msg = msg.split(" ")[0..-1].flatten.map { |a| a.split("#") }.flatten!
+    def search(msg, splitter="#")
+      parts = msg.split(" ")[0..-1].flatten.map { |a| a.split(splitter) }.flatten!
     
       # It's a constant! Oh... and there's nothing else in the string!
-      first = smart_rails_constant_substitutions(msg.first)
-      if /^[A-Z]/.match(first) && msg.size == 1
-       find_constant(first)
+      first = smart_rails_constant_substitutions(parts.first)
+      output = if /^[A-Z]/.match(first) && parts.size == 1
+        find_constant(first)
        # It's a method!
       else
         # Right, so they only specified one argument. Therefore, we look everywhere.
-        if msg.size == 1
-          find_method(msg.last)
+        if parts.size == 1
+          find_method(parts.last)
         # Left, so they specified two arguments. First is probably a constant, so let's find that!
         else
-          find_method(msg.last, first)
-        end  
+          find_method(parts.last, first)
+        end
       end
+      
+      search(msg, ".") if output.empty?
+      return output
     end
     
   end

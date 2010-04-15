@@ -28,6 +28,7 @@ Jeweler::Tasks.new do |s|
   s.autorequire = "lookup"
   s.files = %w(LICENSE README.md Rakefile TODO) + Dir.glob("{lib,spec,bin,doc}/**/*")
 end
+
 Jeweler::GemcutterTasks.new
 
 begin

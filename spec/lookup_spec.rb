@@ -37,6 +37,10 @@ describe "Lookup" do
      APILookup.search("ActiveRecord::Base#nw").should eql([find_entry("ActiveRecord::Base", "new"), find_entry("ActiveRecord::Base", "new_record?")])
   end
   
+  it "should be able to find the constant and method by code examples" do
+    APILookup.search("ActiveRecord::Base.destroy").should eql([find_entry("Time", "now")])
+  end
+  
   it "should be able to search on shortened constants" do
     APILookup.search("ar::base#new").should eql([find_entry("ActiveRecord::Base", "new")])
   end
