@@ -65,6 +65,8 @@ module APILookup
   class Entry < LookupBase
     set_table_name "entries"
     belongs_to :constant, :class_name => "APILookup::Constant"
+    
+    delegate :api, :to => :constant
   end
 
 end

@@ -98,8 +98,17 @@ module APILookup
     end
           
     def search(msg, options={})
-      options[:splitter] ||= "#"
-      splitter = options[:splitter]
+      options[:api] ||= if /^1\.9/.match(msg)
+        "Ruby 1.9"
+      elsif /^1\.8/.match(msg)
+        "Ruby 1.8"
+      elsif /^Rails/.match(msg)
+        "Rails"
+      end
+      
+      msg = msg.gsub(/^(.*?)\s/, "") if options[:api]
+      
+      splitter = options[:splitter] || "#"
       parts = msg.split(" ")[0..-1].flatten.map { |a| a.split(splitter) }.flatten!
       # It's a constant! Oh... and there's nothing else in the string!
       first = smart_rails_constant_substitutions(parts.first)
@@ -116,8 +125,11 @@ module APILookup
         end
         o
       end
+
       
-      output = search(msg, options.merge!(:splitter => ".")) if output.empty? && splitter != "."
+      output = search(msg, options.merge(:splitter => ".")) if output.empty? && splitter != "."
+      
+      output = output.select { |m| m.api.name == options[:api] } if options[:api]
       return output
     end
      

@@ -18,8 +18,12 @@ describe "Lookup" do
     APILookup.search(term, options)
   end
   
-  it "should be able to lookup for Ruby 1.9" do
+  it "should be able to find a method in Ruby 1.9" do
     search("shuffle").should eql(find_entry("Ruby 1.9", "Array", "shuffle"))
+  end
+  
+  it "should be able to lookup for Ruby 1.9 only" do
+    search("1.9 Array#flatten").should eql(find_entry("Ruby 1.9", "Array", "flatten"))
   end
   
   it "should be able to find a constant" do
