@@ -6,7 +6,7 @@ require 'spec/rake/spectask'
 require 'jeweler'
 AUTHOR = "Ryan Bigg"
 EMAIL = "radarlistener@gmail.com"
-HOMEPAGE = "http://gitpilot.com"
+HOMEPAGE = "http://ryanbigg.com"
 SUMMARY = "A gem that provides a lazy man's ri"
 
 Jeweler::Tasks.new do |s|
@@ -22,7 +22,8 @@ Jeweler::Tasks.new do |s|
   s.executables << "lookup"
 
   s.add_dependency("sqlite3-ruby", ">=1.2.5")
-  s.add_dependency("hpricot", ">=0.8.2")
+  s.add_dependency("nokogiri")
+  s.add_development_dependency("webmock")
   
   s.require_path = 'lib'
   s.autorequire = "lookup"

@@ -1,56 +1,31 @@
 require 'rubygems'
+require 'net/http'
+
 require 'active_record'
+require 'nokogiri'
+require 'find_by_hash'
 
 module APILookup
 
   class << self
-    def update
-      require 'hpricot'
-      require 'net/http'
+    def update!
       puts "Updating API, this may take a minute or two. Please be patient!"
-      Constant.delete_all
-      Entry.delete_all
-      # Ruby on Rails Classes & Methods
-      update_api("Rails", "http://api.rubyonrails.org")
-      # Ruby Classes & Methods
-      update_api("Ruby", "http://www.ruby-doc.org/core")
+      [Constant, Entry, Api].map { |klass| klass.delete_all }
       
-      weight_results
-      puts "Updated API index! Use the lookup <method> or lookup <class> <method> to find what you're after"
-    end
-  
-    def update_api(name, url)
-      puts "Updating API for #{name}..."
-      Api.find_or_create_by_name_and_url(name, url)
-      update_methods(Hpricot(Net::HTTP.get(URI.parse("#{url}/fr_method_index.html"))), url)
-      update_classes(Hpricot(Net::HTTP.get(URI.parse("#{url}/fr_class_index.html"))), url)
-      puts "DONE (with #{name})!"
-    end
-  
-    def update_methods(doc, prefix)
-      doc.search("a").each do |a|
-        names = a.inner_html.split(" ")
-        method = names[0]
-        name = names[1].gsub(/[\(|\)]/, "")
-        # The same constant can be defined twice in different APIs, be wary!
-        url = prefix + "/classes/" + name.gsub("::", "/") + ".html"
-        constant = Constant.find_or_create_by_name_and_url(name, url)
-        constant.entries.create!(:name => method, :url => prefix + "/" + a["href"])
-      end
-    end
-  
-    def update_classes(doc, prefix)
-      doc.search("a").each do |a|
-        constant = Constant.find_or_create_by_name_and_url(a.inner_html, prefix + "/" + a["href"])
-      end
+      update_api!("Rails", "http://api.rubyonrails.org")
+      update_api!("Ruby 1.8.7", "http://www.ruby-doc.org/core")
+      update_api!("Ruby 1.9", "http://ruby-doc.org/ruby-1.9")
+      
     end
     
-    # Weights the results so the ones more likely to be used by people come up first.
-    def weight_results
-      e = Constant.find_by_name("ActiveRecord::Associations::ClassMethods").entries.find_by_name("belongs_to")
-      e.increment!(:weighting)
+    def update_api!(name, url)
+      puts "Updating API for #{name}..."
+      api = Api.find_or_create_by_name_and_url(name, url)
+      api.update_methods!
+      api.update_classes!
+      puts "DONE (with #{name})!"
     end
-  
+   
     def find_constant(name, entry=nil)
       # Find by specific name.
       constants = Constant.find_all_by_name(name, :include => "entries")
@@ -69,7 +44,7 @@ module APILookup
       end
       constants
     end
-    
+     
     # this uses a regex to lock down our SQL finds even more
     # so that things like AR::Base will not match
     # ActiveRecord::ConnectionAdapters::DatabaseStatements 
@@ -98,7 +73,7 @@ module APILookup
       end
       name
     end
-  
+    
     # Find an entry.
     # If the constant argument is passed, look it up within the scope of the constant.
     def find_method(name, constant=nil)
@@ -122,9 +97,10 @@ module APILookup
       methods
     end
           
-    def search(msg, splitter="#")
+    def search(msg, options={})
+      options[:splitter] ||= "#"
+      splitter = options[:splitter]
       parts = msg.split(" ")[0..-1].flatten.map { |a| a.split(splitter) }.flatten!
-    
       # It's a constant! Oh... and there's nothing else in the string!
       first = smart_rails_constant_substitutions(parts.first)
       output = if /^[A-Z]/.match(first) && parts.size == 1
@@ -133,17 +109,18 @@ module APILookup
       else
         # Right, so they only specified one argument. Therefore, we look everywhere.
         if parts.size == 1
-          find_method(parts.last)
+          o = find_method(parts.last)
         # Left, so they specified two arguments. First is probably a constant, so let's find that!
         else
-          find_method(parts.last, first)
+          o = find_method(parts.last, first)
         end
+        o
       end
       
-      search(msg, ".") if output.empty?
+      output = search(msg, options.merge!(:splitter => ".")) if output.empty? && splitter != "."
       return output
     end
-    
+     
   end
 end
 

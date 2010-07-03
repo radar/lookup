@@ -2,55 +2,65 @@ require File.dirname(__FILE__) + '/spec_helper'
 
 describe "Lookup" do
   
-  def find_constant(name)
-    APILookup::Constant.find_by_name(name)
+  def find_api(name)
+    APILookup::Api.find_by_name(name)
   end
   
-  def find_entry(constant, name)
-    APILookup::Entry.find_by_name_and_constant_id(name, find_constant(constant).id)
+  def find_constant(api, name)
+    find_api(api).constants.find_by_name(name)
   end
   
-  before do
+  def find_entry(api, constant, name)
+    find_constant(api, constant).entries.find_all_by_name(name)
+  end
+  
+  def search(term, options={})
+    APILookup.search(term, options)
+  end
+  
+  it "should be able to lookup for Ruby 1.9" do
+    search("shuffle").should eql(find_entry("Ruby 1.9", "Array", "shuffle"))
   end
   
   it "should be able to find a constant" do
-    APILookup.search("ActiveRecord::Base").should eql([find_constant("ActiveRecord::Base")])
+    search("ActiveRecord::Base").should eql([find_constant("Rails", "ActiveRecord::Base")])
   end
   
   it "should be able to find a short constant" do
-    APILookup.search("ar::Base").should eql([find_constant("ActiveRecord::Base")])
+    search("ar::Base").should eql([find_constant("Rails", "ActiveRecord::Base")])
   end
   
   it "should be able to find a constant and a method (using hash symbol)" do
-    APILookup.search("ActiveRecord::Base#new").should eql([find_entry("ActiveRecord::Base", "new")])
+    search("ActiveRecord::Base#new").should eql(find_entry("Rails", "ActiveRecord::Base", "new"))
   end
   
   it "should be able to find a constant and a method (using spaces)" do
-     APILookup.search("ActiveRecord::Base new").should eql([find_entry("ActiveRecord::Base", "new")])
-   end
+    search("ActiveRecord::Base new").should eql(find_entry("Rails", "ActiveRecord::Base", "new"))
+  end
   
   it "should be able to find a constant and a method (specified wildcard)" do
-     APILookup.search("ActiveRecord::Base#n*w").should eql([find_entry("ActiveRecord::Base", "new")])
+    search("ActiveRecord::Base#n*w").should eql(find_entry("Rails", "ActiveRecord::Base", "new"))
   end
   
   it "should be able to find a constant and some methods (fuzzy)" do
-     APILookup.search("ActiveRecord::Base#nw").should eql([find_entry("ActiveRecord::Base", "new"), find_entry("ActiveRecord::Base", "new_record?")])
+    search("ActiveRecord::Base#nw").should eql([find_entry("Rails", "ActiveRecord::Base", "new"), find_entry("Rails", "ActiveRecord::Base", "new_record?")].flatten)
   end
   
   it "should be able to find the constant and method by code examples" do
-    APILookup.search("ActiveRecord::Base.destroy").should eql([find_entry("Time", "now")])
+    search("ActiveRecord::Base.destroy").should eql(find_entry("Rails", "ActiveRecord::Base", "destroy"))
   end
   
   it "should be able to search on shortened constants" do
-    APILookup.search("ar::base#new").should eql([find_entry("ActiveRecord::Base", "new")])
+    search("ar::base#new").should eql(find_entry("Rails", "ActiveRecord::Base", "new"))
   end
   
   it "should be able to find it if a hash-symbol is specified" do
-    APILookup.search("#today?").should eql([
-                                            find_entry("ActiveSupport::CoreExtensions::Date::Calculations", "today?"),
-                                            find_entry("ActiveSupport::TimeWithZone", "today?"),
-                                            find_entry("ActiveSupport::CoreExtensions::Time::Calculations", "today?")
-                                           ])
+    # sort_by used here because once it returned it out of order.
+    # Ensure order.
+    APILookup.search("#today?").should eql([ find_entry("Rails", "ActiveSupport::CoreExtensions::Date::Calculations", "today?"),
+                                             find_entry("Rails", "ActiveSupport::TimeWithZone", "today?"),
+                                             find_entry("Rails", "ActiveSupport::CoreExtensions::Time::Calculations", "today?")
+                                           ].flatten!.sort_by(&:id))
   end
   
 end

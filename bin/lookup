@@ -52,6 +52,7 @@ op=OptionParser.new do |opts|
   opts.on("-c", "--clear", "Clear database") do
     OPTIONS[:clear] = true
   end
+  
   opts.on("-t", "--text", "Text only") do
     OPTIONS[:text] = true
   end
