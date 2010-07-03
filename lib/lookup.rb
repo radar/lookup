@@ -102,7 +102,7 @@ module APILookup
         "Ruby 1.9"
       elsif /^1\.8/.match(msg)
         "Ruby 1.8"
-      elsif /^Rails/.match(msg)
+      elsif /^Rails/i.match(msg)
         "Rails"
       end
       
