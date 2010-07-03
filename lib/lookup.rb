@@ -101,7 +101,7 @@ module APILookup
       options[:api] ||= if /^1\.9/.match(msg)
         "Ruby 1.9"
       elsif /^1\.8/.match(msg)
-        "Ruby 1.8"
+        "Ruby 1.8.7"
       elsif /^Rails/i.match(msg)
         "Rails"
       end
@@ -126,11 +126,13 @@ module APILookup
         o
       end
 
-      
       output = search(msg, options.merge(:splitter => ".")) if output.empty? && splitter != "."
       
-      output = output.select { |m| m.api.name == options[:api] } if options[:api]
-      return output
+      options[:api] ||= ["Ruby 1.8.7", "Rails"]
+      selected_output = output.select { |m| options[:api].include?(m.api.name) }
+      selected_output = output if selected_output.empty?
+
+      return selected_output
     end
      
   end

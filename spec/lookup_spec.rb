@@ -26,6 +26,14 @@ describe "Lookup" do
     search("1.9 Array#flatten").should eql(find_entry("Ruby 1.9", "Array", "flatten"))
   end
   
+  it "should lookup for 1.8 and Rails if no API specified" do
+    search("Array#flatten").should eql(find_entry("Ruby 1.8.7", "Array", "flatten"))
+  end
+  
+  it "should lookup for 1.8" do
+    search("1.8 Array#flatten").should eql(find_entry("Ruby 1.8.7", "Array", "flatten"))
+  end
+  
   it "should be able to find a constant" do
     search("ActiveRecord::Base").should eql([find_constant("Rails", "ActiveRecord::Base")])
   end
