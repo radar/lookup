@@ -20,6 +20,14 @@ Then you'll be able to:
  * `lookup ActiveRecord::Base` (returns a single consant)
  * `lookup av::Base` ("av" maps to ActionView, so returns ActionView::Base constant)
  
+## Specifying an API
+
+You may specify an API to search in by making the first term either `1.8`, `1.9` or `rails` like this:
+
+ * `lookup 1.9 Array#combination`
+ 
+By default all APIs are searched.
+ 
 ## Options
 
 It also takes options:
