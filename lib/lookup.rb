@@ -1,9 +1,10 @@
 require 'rubygems'
+require 'bundler'
 require 'net/http'
 
+Bundler.setup
+Bundler.require(:default)
 require 'active_record'
-require 'nokogiri'
-require 'find_by_hash'
 
 module APILookup
 
