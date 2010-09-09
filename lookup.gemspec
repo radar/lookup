@@ -13,7 +13,7 @@ Gem::Specification.new do |s|
   s.date = %q{2010-07-04}
   s.description = %q{A gem that provides a lazy man's ri}
   s.email = %q{radarlistener@gmail.com}
-  s.executables = ["lookup", "lookup"]
+  s.executables = ["lookup"]
   s.extra_rdoc_files = [
     "LICENSE",
      "README.md",

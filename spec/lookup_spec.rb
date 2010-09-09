@@ -1,6 +1,9 @@
 require File.dirname(__FILE__) + '/spec_helper'
 
 describe "Lookup" do
+  before(:all) do
+    # APILookup.update!
+  end
   
   def find_api(name)
     APILookup::Api.find_by_name(name)
@@ -19,15 +22,11 @@ describe "Lookup" do
   end
   
   it "should be able to find a method in Ruby 1.9" do
-    search("shuffle").should eql(find_entry("Ruby 1.9", "Array", "shuffle"))
+    search("1.9 shuffle").should eql(find_entry("Ruby 1.9", "Array", "shuffle"))
   end
   
   it "should be able to lookup for Ruby 1.9 only" do
     search("1.9 Array#flatten").should eql(find_entry("Ruby 1.9", "Array", "flatten"))
-  end
-  
-  it "should lookup for 1.8 and Rails if no API specified" do
-    search("Array#flatten").should eql(find_entry("Ruby 1.8.7", "Array", "flatten"))
   end
   
   it "should lookup for 1.8" do
@@ -35,43 +34,47 @@ describe "Lookup" do
   end
   
   it "should be able to find a constant" do
-    search("ActiveRecord::Base").should eql([find_constant("Rails", "ActiveRecord::Base")])
+    search("v2.3.8 ActiveRecord::Base").should eql([find_constant("Rails v2.3.8", "ActiveRecord::Base")])
   end
   
   it "should be able to find a short constant" do
-    search("ar::Base").should eql([find_constant("Rails", "ActiveRecord::Base")])
+    search("v2.3.8 ar::Base").should eql([find_constant("Rails v2.3.8", "ActiveRecord::Base")])
   end
   
   it "should be able to find a constant and a method (using hash symbol)" do
-    search("ActiveRecord::Base#new").should eql(find_entry("Rails", "ActiveRecord::Base", "new"))
+    search("v2.3.8 ActiveRecord::Base#new").should eql(find_entry("Rails v2.3.8", "ActiveRecord::Base", "new"))
   end
   
   it "should be able to find a constant and a method (using spaces)" do
-    search("ActiveRecord::Base new").should eql(find_entry("Rails", "ActiveRecord::Base", "new"))
+    search("v2.3.8 ActiveRecord::Base new").should eql(find_entry("Rails v2.3.8", "ActiveRecord::Base", "new"))
   end
   
   it "should be able to find a constant and a method (specified wildcard)" do
-    search("ActiveRecord::Base#n*w").should eql(find_entry("Rails", "ActiveRecord::Base", "new"))
+    search("v2.3.8 ActiveRecord::Base#n*w").should eql(find_entry("Rails v2.3.8", "ActiveRecord::Base", "new"))
   end
   
   it "should be able to find a constant and some methods (fuzzy)" do
-    search("ActiveRecord::Base#nw").should eql([find_entry("Rails", "ActiveRecord::Base", "new"), find_entry("Rails", "ActiveRecord::Base", "new_record?")].flatten)
+    search("v2.3.8 ActiveRecord::Base#nw").should eql([find_entry("Rails v2.3.8", "ActiveRecord::Base", "new"), find_entry("Rails v2.3.8", "ActiveRecord::Base", "new_record?")].flatten)
   end
   
   it "should be able to find the constant and method by code examples" do
-    search("ActiveRecord::Base.destroy").should eql(find_entry("Rails", "ActiveRecord::Base", "destroy"))
+    search("v2.3.8 ActiveRecord::Base.destroy").should eql(find_entry("Rails v2.3.8", "ActiveRecord::Base", "destroy"))
   end
   
   it "should be able to search on shortened constants" do
-    search("ar::base#new").should eql(find_entry("Rails", "ActiveRecord::Base", "new"))
+    search("v2.3.8 ar::base#new").should eql(find_entry("Rails v2.3.8", "ActiveRecord::Base", "new"))
+  end
+  
+  it "Should be able to find a Rails 3 constant" do
+    search("v3.0.0 Rails::Engine").should eql([find_constant("Rails v3.0.0", "Rails::Engine")])
   end
   
   it "should be able to find it if a hash-symbol is specified" do
     # sort_by used here because once it returned it out of order.
     # Ensure order.
-    APILookup.search("#today?").should eql([ find_entry("Rails", "ActiveSupport::CoreExtensions::Date::Calculations", "today?"),
-                                             find_entry("Rails", "ActiveSupport::TimeWithZone", "today?"),
-                                             find_entry("Rails", "ActiveSupport::CoreExtensions::Time::Calculations", "today?")
+    APILookup.search("v2.3.8 #today?").should eql([ find_entry("Rails v2.3.8", "ActiveSupport::CoreExtensions::Date::Calculations", "today?"),
+                                             find_entry("Rails v2.3.8", "ActiveSupport::TimeWithZone", "today?"),
+                                             find_entry("Rails v2.3.8", "ActiveSupport::CoreExtensions::Time::Calculations", "today?")
                                            ].flatten!.sort_by(&:id))
   end
   

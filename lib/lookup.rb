@@ -13,7 +13,8 @@ module APILookup
       puts "Updating API, this may take a minute or two. Please be patient!"
       [Constant, Entry, Api].map { |klass| klass.delete_all }
       
-      update_api!("Rails", "http://api.rubyonrails.org")
+      update_api!("Rails v3.0.0", "http://api.rubyonrails.org")
+      update_api!("Rails v2.3.8", "http://api.rubyonrails.org/v2.3.8")
       update_api!("Ruby 1.8.7", "http://www.ruby-doc.org/core")
       update_api!("Ruby 1.9", "http://ruby-doc.org/ruby-1.9")
       
@@ -27,16 +28,17 @@ module APILookup
       puts "DONE (with #{name})!"
     end
    
-    def find_constant(name, entry=nil)
+    def find_constant(name, entry=nil, options={})
+      scope = options[:api].constants || Constant
       # Find by specific name.
-      constants = Constant.find_all_by_name(name, :include => "entries")
+      constants = scope.find_all_by_name(name, :include => "entries")
       # search for class methods, which is prolly what we want if we can find it
-      constants = Constant.find_all_by_name("#{name}::ClassMethods", :include => "entries") if constants.empty?
+      constants = scope.find_all_by_name("#{name}::ClassMethods", :include => "entries") if constants.empty?
       # Find by name beginning with <blah>.
-      constants = Constant.all(:conditions => ["name LIKE ?", name + "%"], :include => "entries") if constants.empty?
+      constants = scope.all(:conditions => ["constants.name LIKE ?", name + "%"], :include => "entries") if constants.empty?
       # Find by fuzzy.
       match="%#{name.split("").join("%")}%"
-      constants = Constant.find_by_sql("select * from constants where name LIKE '#{match}'") if constants.empty?
+      constants = scope.find_by_sql("select * from constants where name LIKE '#{match}'") if constants.empty?
       regex=build_regex_from_constant(name)
       constants = constants.select { |x| x.name =~ regex }
       # Narrow it down to the constants that only contain the entry we are looking for.
@@ -77,22 +79,23 @@ module APILookup
     
     # Find an entry.
     # If the constant argument is passed, look it up within the scope of the constant.
-    def find_method(name, constant=nil)
+    def find_method(name, constant=nil, options = {})
+      scope = options[:api].entries || Entry
       methods = []
       # Full match
-      methods = Entry.find_all_by_name(name.to_s)
+      methods = scope.find_all_by_name(name.to_s)
       # Start match
-      methods = Entry.all(:conditions => ["name LIKE ?", name.to_s + "%"]) if methods.empty?
+      methods = scope.all(:conditions => ["entries.name LIKE ?", name.to_s + "%"]) if methods.empty?
       # Wildcard substitution
-      methods = Entry.find_by_sql("select * from entries where name LIKE '#{name.to_s.gsub("*", "%")}'") if methods.empty?
+      methods = scope.find_by_sql("select * from entries where name LIKE '#{name.to_s.gsub("*", "%")}'") if methods.empty?
       # Fuzzy match
-      methods = Entry.find_by_sql("select * from entries where name LIKE '%#{name.to_s.split("").join("%")}%'") if methods.empty?
+      methods = scope.find_by_sql("select * from entries where name LIKE '%#{name.to_s.split("").join("%")}%'") if methods.empty?
       
       # Weight the results, last result is the first one we want shown first
       methods = methods.sort_by(&:weighting)
     
       if constant
-        constants = find_constant(constant)
+        constants = find_constant(constant, nil, options)
         methods = methods.select { |m| constants.include?(m.constant) }
       end
       methods
@@ -103,9 +106,11 @@ module APILookup
         "Ruby 1.9"
       elsif /^1\.8/.match(msg)
         "Ruby 1.8.7"
-      elsif /^Rails/i.match(msg)
-        "Rails"
+      elsif /^v([\d\.]{5})/i.match(msg)
+        "Rails v#{$1}"
       end
+      
+      options[:api] = Api.find_by_name!(options[:api]) unless options[:api].is_a?(Api)
       
       msg = msg.gsub(/^(.*?)\s/, "") if options[:api]
       
@@ -113,24 +118,23 @@ module APILookup
       parts = msg.split(" ")[0..-1].flatten.map { |a| a.split(splitter) }.flatten!
       # It's a constant! Oh... and there's nothing else in the string!
       first = smart_rails_constant_substitutions(parts.first)
+      
       output = if /^[A-Z]/.match(first) && parts.size == 1
-        find_constant(first)
+        find_constant(first, nil, options)
        # It's a method!
       else
         # Right, so they only specified one argument. Therefore, we look everywhere.
         if parts.size == 1
-          o = find_method(parts.last)
+          o = find_method(parts.last, nil, options)
         # Left, so they specified two arguments. First is probably a constant, so let's find that!
         else
-          o = find_method(parts.last, first)
+          o = find_method(parts.last, first, options)
         end
         o
       end
 
       output = search(msg, options.merge(:splitter => ".")) if output.empty? && splitter != "."
-      
-      options[:api] ||= ["Ruby 1.8.7", "Rails"]
-      selected_output = output.select { |m| options[:api].include?(m.api.name) }
+      selected_output = output.select { |m| options[:api].name == m.api.name }
       selected_output = output if selected_output.empty?
 
       return selected_output

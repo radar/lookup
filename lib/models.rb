@@ -21,6 +21,7 @@ module APILookup
   class Api < LookupBase
     set_table_name "apis"
     has_many :constants, :class_name => "APILookup::Constant"
+    has_many :entries, :through => :constants
     
     def update_methods!
       entries = []
@@ -29,7 +30,8 @@ module APILookup
       
       # Actual HTML on Ruby doc site is invalid. 
       # This makes it valid.
-      doc = Nokogiri::HTML(doc.gsub(/<a(.*?)>(.*?)<\/a>/) { "<a#{$1}>#{$2.gsub("<", "&lt;").gsub("&gt;", ">")}" })
+      doc = Nokogiri::HTML(doc.gsub(/<a(.*?)>(.*?)<\/a>/m) { "<a#{$1}>#{$2.gsub("<", "&lt;").gsub(">", "&gt;")}" })
+      
       doc.css("a").each do |a|
         names = a.text.split(" ")
         next if names.empty? 
@@ -37,10 +39,10 @@ module APILookup
         constant = names[1].gsub(/[\(|\)]/, "")
         # The same constant can be defined twice in different APIs, be wary!
         url = self.url + "/classes/" + constant.gsub("::", "/") + ".html"
-        constant = self.constants.find_or_create_by_hash(:name => constant, :url => url)
+        constant = self.constants.find_or_create_by_name_and_url(constant, url)
         
         url = self.url + "/" + a["href"]
-        constant.entries.find_or_create_by_hash(:name => method, :url => url)
+        constant.entries.find_or_create_by_name_and_url(method, url)
       end
       
       # entries.each_slice(100) do |methods|
