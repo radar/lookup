@@ -23,6 +23,7 @@ Jeweler::Tasks.new do |s|
 
   s.add_dependency("sqlite3-ruby", ">=1.2.5")
   s.add_dependency("nokogiri")
+  s.add_dependency("activerecord", ">= 2.3.8")
   s.add_development_dependency("webmock")
   
   s.require_path = 'lib'
