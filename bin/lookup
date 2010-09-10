@@ -75,6 +75,6 @@ if search_string.strip.empty?
   puts op.help
   puts
 else
-  results=APILookup.search(search_string)
+  results=Lookup.search(search_string)
   display_results(results, search_string)
 end

@@ -2,11 +2,11 @@ require File.dirname(__FILE__) + '/spec_helper'
 
 describe "Lookup" do
   before(:all) do
-    # APILookup.update!
+    # Lookup.update!
   end
   
   def find_api(name)
-    APILookup::Api.find_by_name(name)
+    Lookup::Api.find_by_name(name)
   end
   
   def find_constant(api, name)
@@ -18,7 +18,7 @@ describe "Lookup" do
   end
   
   def search(term, options={})
-    APILookup.search(term, options)
+    Lookup.search(term, options)
   end
   
   it "should be able to find a method in Ruby 1.9" do
@@ -72,7 +72,7 @@ describe "Lookup" do
   it "should be able to find it if a hash-symbol is specified" do
     # sort_by used here because once it returned it out of order.
     # Ensure order.
-    APILookup.search("v2.3.8 #today?").should eql([ find_entry("Rails v2.3.8", "ActiveSupport::CoreExtensions::Date::Calculations", "today?"),
+    Lookup.search("v2.3.8 #today?").should eql([ find_entry("Rails v2.3.8", "ActiveSupport::CoreExtensions::Date::Calculations", "today?"),
                                              find_entry("Rails v2.3.8", "ActiveSupport::TimeWithZone", "today?"),
                                              find_entry("Rails v2.3.8", "ActiveSupport::CoreExtensions::Time::Calculations", "today?")
                                            ].flatten!.sort_by(&:id))

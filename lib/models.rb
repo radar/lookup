@@ -1,6 +1,6 @@
 require 'fileutils'
 
-module APILookup
+module Lookup
 
   class MissingHome < StandardError
   end
@@ -20,7 +20,7 @@ module APILookup
 
   class Api < LookupBase
     set_table_name "apis"
-    has_many :constants, :class_name => "APILookup::Constant"
+    has_many :constants, :class_name => "Lookup::Constant"
     has_many :entries, :through => :constants
     
     def update_methods!
@@ -60,13 +60,13 @@ module APILookup
 
   class Constant < LookupBase
     set_table_name "constants"
-    belongs_to :api, :class_name => "APILookup::Api"
-    has_many :entries, :class_name => "APILookup::Entry"
+    belongs_to :api, :class_name => "Lookup::Api"
+    has_many :entries, :class_name => "Lookup::Entry"
   end
   
   class Entry < LookupBase
     set_table_name "entries"
-    belongs_to :constant, :class_name => "APILookup::Constant"
+    belongs_to :constant, :class_name => "Lookup::Constant"
     
     delegate :api, :to => :constant
   end
@@ -75,7 +75,7 @@ end
 
 class SetupTables < ActiveRecord::Migration
   def self.connection
-    APILookup::Api.connection
+    Lookup::Api.connection
   end
 
   def self.up
@@ -101,9 +101,9 @@ end
 
 FileUtils.mkdir_p(File.join(ENV["HOME"],".lookup"))
 
-if !APILookup::Api.table_exists? && 
-   !APILookup::Constant.table_exists? && 
-   !APILookup::Entry.table_exists?
+if !Lookup::Api.table_exists? && 
+   !Lookup::Constant.table_exists? && 
+   !Lookup::Entry.table_exists?
   SetupTables.up
-  APILookup.update!
+  Lookup.update!
 end

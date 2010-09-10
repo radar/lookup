@@ -6,7 +6,7 @@ Bundler.setup
 Bundler.require(:default)
 require 'active_record'
 
-module APILookup
+module Lookup
 
   class << self
     def update!
