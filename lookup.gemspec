@@ -21,6 +21,7 @@ Gem::Specification.new do |s|
 
   s.add_development_dependency "bundler", ">= 1.0.0"
   
+  s.add_dependency("%q<bundler>", [">= 0"])
   s.add_dependency(%q<sqlite3-ruby>, [">= 1.2.5"])
   s.add_dependency(%q<nokogiri>, [">= 0"])
   s.add_dependency(%q<activerecord>, [">= 2.3.8"])
