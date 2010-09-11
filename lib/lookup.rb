@@ -1,12 +1,16 @@
 require 'rubygems'
-require 'bundler'
 require 'net/http'
 
-Bundler.setup
+gemfile = File.expand_path('../../Gemfile', __FILE__)
+require 'bundler'
+ENV['BUNDLE_GEMFILE'] = gemfile
 Bundler.require(:default)
-require 'active_record'
 
 module Lookup
+  VERSION = "1.0.0.beta2"
+  APIS = []
+  
+  class APINotFound < StandardError; end
 
   class << self
     def update!
@@ -23,6 +27,7 @@ module Lookup
     def update_api!(name, url)
       puts "Updating API for #{name}..."
       api = Api.find_or_create_by_name_and_url(name, url)
+      APIS << api
       api.update_methods!
       api.update_classes!
       puts "DONE (with #{name})!"
@@ -109,6 +114,16 @@ module Lookup
       elsif /^v([\d\.]{5})/i.match(msg)
         "Rails v#{$1}"
       end
+      
+      raise Lookup::APINotFound, %Q{You must specify a valid API as the first keyword. Included APIs:
+   v2.3.8 - Rails 2.3.8 
+   v3.0.0 - Rails 3.0.0
+   1.9    - Ruby 1.9
+   1.8    - Ruby 1.8
+   
+   Example usage: lookup v2.3.8 ActiveRecord::Base
+   } if options[:api].blank?
+          
       
       options[:api] = Api.find_by_name!(options[:api]) unless options[:api].is_a?(Api)
       

@@ -1,5 +1,5 @@
 source 'http://rubygems.org'
-gem 'activerecord'
+gem 'activerecord', :require => "active_record"
 gem 'nokogiri'
 gem 'find_by_hash'
 gem 'sqlite3-ruby'

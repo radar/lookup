@@ -5,4 +5,8 @@ describe "testing for regressions" do
     lambda { Lookup.search("v2.3.8 #today?") }.should_not raise_error
   end
   
+  it "must have an API specified" do
+    lambda { Lookup.search("ActiveRecord::Base") }.should raise_error(Lookup::APINotFound)
+  end
+  
 end

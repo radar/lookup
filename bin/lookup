@@ -1,5 +1,6 @@
-#!/usr/bin/ruby
+#!/usr/bin/env ruby
 require 'optparse'
+require 'pathname'
 
 # How many methods / constants to return.
 THRESHOLD = 5
@@ -7,7 +8,7 @@ MAC = !!/darwin/.match(RUBY_PLATFORM)
 WINDOWS = !!/win/.match(RUBY_PLATFORM) if not MAC
 
 def clear_database
-  file = File.join(File.dirname(__FILE__), "lookup.sqlite3")
+  file = Pathname.new(ENV["HOME"]) + ".lookup/lookup.sqlite3"
   FileUtils.rm(file) if File.exists?(file) 
 end
 
@@ -45,23 +46,6 @@ def display_results(results, search_string)
   end
 end
 
-OPTIONS = {}
-op=OptionParser.new do |opts|
-  opts.banner = "Usage: lookup <constant|method> [method] [OPTIONS]"
-
-  opts.on("-c", "--clear", "Clear database") do
-    OPTIONS[:clear] = true
-  end
-  
-  opts.on("-t", "--text", "Text only") do
-    OPTIONS[:text] = true
-  end
-end
-op.parse!
-
-clear_database if OPTIONS[:clear]
-
-
 local_lib=File.join(File.dirname(__FILE__), "../lib/lookup")
 if File.exists?(local_lib + ".rb")
   require local_lib
@@ -70,11 +54,48 @@ else
   require 'lookup' 
 end
 
-search_string=ARGV[0..-1].join(" ")
-if search_string.strip.empty?
-  puts op.help
-  puts
+OPTIONS = {}
+output = nil
+op=OptionParser.new do |opts|
+  opts.banner = %Q{
+    Usage: lookup <api> <constant|method> [method] [OPTIONS]
+    APIs are:
+    v3.0.0 - Rails 3.0.0
+    v2.3.8 - Rails 2.3.8
+    1.9    - Ruby 1.9
+    1.8    - Ruby 1.8
+    
+    Example: lookup v3.0.0 ActiveRecord::Base new
+  }
+
+  opts.on("-c", "--clear", "Clear database") do
+    OPTIONS[:clear] = true
+  end
+  
+  opts.on("-t", "--text", "Text only") do
+    OPTIONS[:text] = true
+  end
+  
+  opts.on("-v", "--version", "Version of lookup") do
+    output = Lookup::VERSION
+  end
+end
+op.parse!
+
+clear_database if OPTIONS[:clear]
+unless output
+  begin
+    search_string=ARGV[0..-1].join(" ")
+    if search_string.strip.empty?
+      puts op.help
+
+    else
+      results=Lookup.search(search_string)
+      display_results(results, search_string)
+    end
+  rescue Lookup::APINotFound => e
+    puts e.message
+  end
 else
-  results=Lookup.search(search_string)
-  display_results(results, search_string)
+  puts output
 end

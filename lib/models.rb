@@ -6,7 +6,6 @@ module Lookup
   end
   
   class LookupBase < ActiveRecord::Base
-    include FindByHash
   end
   
   if ENV["HOME"].nil?
