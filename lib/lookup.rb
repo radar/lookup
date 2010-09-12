@@ -7,7 +7,7 @@ ENV['BUNDLE_GEMFILE'] = gemfile
 Bundler.require(:default)
 
 module Lookup
-  VERSION = "1.0.0.beta5"
+  VERSION = "1.0.0.beta6"
   APIS = []
   
   class APINotFound < StandardError; end
