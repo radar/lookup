@@ -40,7 +40,11 @@ module Lookup
         url = self.url + "/classes/" + constant.gsub("::", "/") + ".html"
         constant = self.constants.find_or_create_by_name_and_url(constant, url)
         
-        url = self.url + "/" + a["href"]
+        if !/^http:\/\//.match(a["href"])
+          url = self.url + "/" + a["href"]
+        else
+          url = a["href"]
+        end
         constant.entries.find_or_create_by_name_and_url(method, url)
       end
       

@@ -9,4 +9,8 @@ describe "testing for regressions" do
     lambda { Lookup.search("ActiveRecord::Base") }.should raise_error(Lookup::APINotFound)
   end
   
+  it "must have a valid URL" do
+    Lookup.search("1.9 Array#shuffle").first.url.scan("http").size.should eql(1)
+  end
+  
 end
