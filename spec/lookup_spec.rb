@@ -33,6 +33,15 @@ describe "Lookup" do
     search("1.8 Array#flatten").should eql(find_entry("Ruby 1.8", "Array", "flatten"))
   end
   
+  it "should lookup for the current version of Ruby" do
+    case RUBY_VERSION
+      when /^1.8/
+        search("Array#flatten").should eql(find_entry("Ruby 1.8", "Array", "flatten"))
+      when /^1.9/
+        search("Array#flatten").should eql(find_entry("Ruby 1.9", "Array", "flatten"))
+      end
+  end
+  
   it "should be able to find a constant" do
     search("v2.3.8 ActiveRecord::Base").should eql([find_constant("Rails v2.3.8", "ActiveRecord::Base")])
   end

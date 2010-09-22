@@ -59,11 +59,6 @@ output = nil
 op=OptionParser.new do |opts|
   opts.banner = %Q{
     Usage: lookup <api> <constant|method> [method] [OPTIONS]
-    APIs are:
-    v3.0.0 - Rails 3.0.0
-    v2.3.8 - Rails 2.3.8
-    1.9    - Ruby 1.9
-    1.8    - Ruby 1.8
     
     Example: lookup v3.0.0 ActiveRecord::Base new
   }

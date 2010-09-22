@@ -6,6 +6,18 @@ require 'bundler'
 ENV['BUNDLE_GEMFILE'] = gemfile
 Bundler.require(:default)
 
+# Because some of you don't have ActiveSupport 3.0
+# And I'm too lazy to require all the shit for 2.3.8 just for this.
+
+class Hash
+  def stringify_keys!
+    keys.each do |key|
+      self[key.to_s] = delete(key)
+    end
+    self
+  end
+end
+
 module Lookup
   VERSION = "1.0.0.beta7"
   APIS = []
@@ -23,7 +35,7 @@ module Lookup
     end
       
     def apis
-      apis = config["apis"]
+      apis = config["apis"].stringify_keys!
     end
     
     def update!
@@ -120,27 +132,26 @@ module Lookup
     end
           
     def search(msg, options={})
-      options[:api] ||= if /^1\.9/.match(msg)
-        "Ruby 1.9"
-      elsif /^1\.8/.match(msg)
-        "Ruby 1.8"
-      elsif /^v([\d\.]{5})/i.match(msg)
-        "Rails v#{$1}"
+      options[:api] ||= msg.split.first
+      api_check = lambda { |options| (!apis.keys.map(&:to_s).include?(options[:api]) && !options[:api].is_a?(Api)) }
+      # to_s because yaml interprets "1.8" as a literal 1.8
+      # And because I'm super, super lazy
+      if !@attempted_ruby && api_check.call(options)
+        # Attempt a current Ruby lookup
+        @attempted_ruby = true
+        api = case RUBY_VERSION
+          when /^1.8/
+            "1.8"
+          when /^1.9/
+            "1.9"
+        end
+        search(msg, options.merge!(:api => api)) if api 
       end
       
-      raise Lookup::APINotFound, %Q{You must specify a valid API as the first keyword. Included APIs:
-   v2.3.8 - Rails 2.3.8 
-   v3.0.0 - Rails 3.0.0
-   1.9    - Ruby 1.9
-   1.8    - Ruby 1.8
-   
-   Example usage: lookup v2.3.8 ActiveRecord::Base
-   } if options[:api].blank?
-          
+      options[:api] = Api.find_by_name!(apis[options[:api]]["name"]) unless options[:api].is_a?(Api)
       
-      options[:api] = Api.find_by_name!(options[:api]) unless options[:api].is_a?(Api)
-      
-      msg = msg.gsub(/^(.*?)\s/, "") if options[:api]
+      # We want to retain message.
+      msg = msg.gsub(/^(.*?)\s/, "")
       
       splitter = options[:splitter] || "#"
       parts = msg.split(" ")[0..-1].flatten.map { |a| a.split(splitter) }.flatten!
@@ -167,9 +178,17 @@ module Lookup
 
       return selected_output
     end
+
+    private
      
+    def api_not_found
+      raise Lookup::APINotFound, %Q{You must specify a valid API as the first keyword. Included APIs:\n} +
+          (apis.map do |short, info|
+            "#{short} - #{info["name"]}"
+          end.join("\n"))
+
+    end
   end
 end
-
 
 require File.join(File.dirname(__FILE__), 'models')
