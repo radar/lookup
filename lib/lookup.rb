@@ -19,7 +19,7 @@ class Hash
 end
 
 module Lookup
-  VERSION = "1.0.0.beta7"
+  VERSION = "1.0.0.beta8"
   APIS = []
   
   class APINotFound < StandardError; end
