@@ -24,7 +24,7 @@ And for those of you who are Ruby inclined:
 
 Or if you want to to look up for your current version of Ruby, simply:
 
- * `lookup Array#join (Returns a single method from either Ruby 1.8 or Ruby 1.9. Other implementations not yet supported.)
+ * `lookup Array#join` (Returns a single method from either Ruby 1.8 or Ruby 1.9. Other implementations not yet supported.)
  
 ## Options
 
