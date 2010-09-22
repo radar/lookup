@@ -1,0 +1,21 @@
+apis:
+  faker:
+    name: Faker
+    url: "http://faker.rubyforge.org/rdoc/"
+    
+  v3.0.0:
+    name: Rails v3.0.0
+    url: "http://api.rubyonrails.org"
+
+  v2.3.8:
+    name: Rails v2.3.8
+    url: "http://api.rubyonrails.org/v2.3.8"
+
+  1.8:
+    name: Ruby 1.8
+    url: "http://www.ruby-doc.org/core"  
+
+  1.9:
+    name: Ruby 1.9
+    url: "http://ruby-doc.org/ruby-1.9"
+    

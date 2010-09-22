@@ -1,9 +1,9 @@
 require File.dirname(__FILE__) + '/spec_helper'
 
 describe "Lookup" do
-  before(:all) do
-    Lookup.update!
-  end
+  #before(:all) do
+  #  Lookup.update!
+  #end
   
   def find_api(name)
     Lookup::Api.find_by_name(name)
@@ -30,7 +30,7 @@ describe "Lookup" do
   end
   
   it "should lookup for 1.8" do
-    search("1.8 Array#flatten").should eql(find_entry("Ruby 1.8.7", "Array", "flatten"))
+    search("1.8 Array#flatten").should eql(find_entry("Ruby 1.8", "Array", "flatten"))
   end
   
   it "should be able to find a constant" do

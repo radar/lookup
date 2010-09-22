@@ -13,24 +13,37 @@ module Lookup
   class APINotFound < StandardError; end
 
   class << self
+    
+    def home
+      Pathname.new(ENV["HOME"]) + ".lookup"
+    end
+    
+    def config
+      YAML.load_file(home + "config")
+    end
+      
+    def apis
+      apis = config["apis"]
+    end
+    
     def update!
       puts "Updating API, this may take a minute or two. Please be patient!"
       [Constant, Entry, Api].map { |klass| klass.delete_all }
-      
-      update_api!("Rails v3.0.0", "http://api.rubyonrails.org")
-      update_api!("Rails v2.3.8", "http://api.rubyonrails.org/v2.3.8")
-      update_api!("Ruby 1.8.7", "http://www.ruby-doc.org/core")
-      update_api!("Ruby 1.9", "http://ruby-doc.org/ruby-1.9")
-      
+      puts "Updating #{apis.size} APIs."
+      for api in apis.values
+        update_api!(api["name"], api["url"])
+      end
     end
     
     def update_api!(name, url)
       puts "Updating API for #{name}..."
       api = Api.find_or_create_by_name_and_url(name, url)
       APIS << api
+      puts "Updating methods for #{name}"
       api.update_methods!
+      puts "Updating classes for #{name}"
       api.update_classes!
-      puts "DONE (with #{name})!"
+      puts "The #{name} API is done."
     end
    
     def find_constant(name, entry=nil, options={})
@@ -110,7 +123,7 @@ module Lookup
       options[:api] ||= if /^1\.9/.match(msg)
         "Ruby 1.9"
       elsif /^1\.8/.match(msg)
-        "Ruby 1.8.7"
+        "Ruby 1.8"
       elsif /^v([\d\.]{5})/i.match(msg)
         "Rails v#{$1}"
       end

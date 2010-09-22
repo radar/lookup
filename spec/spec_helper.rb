@@ -39,9 +39,13 @@ stub_request(:get, "http://www.ruby-doc.org/core/fr_class_index.html").to_return
 stub_request(:get, "http://ruby-doc.org/ruby-1.9/fr_method_index.html").to_return(:body => entries("1.9"))
 stub_request(:get, "http://ruby-doc.org/ruby-1.9/fr_class_index.html").to_return(:body => classes("1.9"))
 
+stub_request(:get, "http://faker.rubyforge.org/rdoc//fr_method_index.html").to_return(:body => entries("faker"))
+stub_request(:get, "http://faker.rubyforge.org/rdoc//fr_class_index.html").to_return(:body => classes("faker"))
+
+# Copy over default config.
+FileUtils.cp(here + "../config/lookup", here + "config")
 
 require 'lookup'
-# require 'pathname'
 
 RSpec.configure do |config|
   
