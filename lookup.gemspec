@@ -8,8 +8,8 @@ Gem::Specification.new do |s|
   s.authors     = []
   s.email       = []
   s.homepage    = "http://rubygems.org/gems/lookup"
-  s.summary     = "TODO: Write a gem summary"
-  s.description = "TODO: Write a gem description"
+  s.summary     = "Lazy man's RI"
+  s.description = "Lazy man's RI"
 
   s.required_rubygems_version = ">= 1.3.6"
   s.rubyforge_project         = "lookup"
