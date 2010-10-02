@@ -2,6 +2,7 @@ require 'net/http'
 require 'fileutils'
 
 require 'active_record'
+require 'nokogiri'
 
 
 # Because some of you don't have ActiveSupport 3.0
