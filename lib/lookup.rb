@@ -1,14 +1,11 @@
-require 'rubygems'
 require 'net/http'
+require 'fileutils'
 
-gemfile = File.expand_path('../../Gemfile', __FILE__)
-require 'bundler'
-ENV['BUNDLE_GEMFILE'] = gemfile
-Bundler.require(:default)
+require 'active_record'
+
 
 # Because some of you don't have ActiveSupport 3.0
 # And I'm too lazy to require all the shit for 2.3.8 just for this.
-
 class Hash
   def stringify_keys!
     keys.each do |key|
@@ -19,7 +16,6 @@ class Hash
 end
 
 module Lookup
-  VERSION = "1.0.0"
   APIS = []
   
   class APINotFound < StandardError; end
@@ -39,6 +35,11 @@ module Lookup
     end
     
     def update!
+      FileUtils.mkdir_p(home)
+      if !File.exists?(home + "config")
+        FileUtils.cp(File.dirname(__FILE__) + "/../config/lookup", home + "config")
+      end
+      
       puts "Updating API, this may take a minute or two. Please be patient!"
       [Constant, Entry, Api].map { |klass| klass.delete_all }
       puts "Updating #{apis.size} APIs."
@@ -191,4 +192,4 @@ module Lookup
   end
 end
 
-require File.join(File.dirname(__FILE__), 'models')
+require 'lookup/models'

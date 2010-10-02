@@ -1,3 +1,12 @@
+PATH
+  remote: .
+  specs:
+    lookup (1.1.0)
+      activerecord (>= 2.3.8)
+      nokogiri
+      sqlite3-ruby (>= 1.2.5)
+      webmock
+
 GEM
   remote: http://rubygems.org/
   specs:
@@ -17,8 +26,6 @@ GEM
     builder (2.1.2)
     crack (0.1.8)
     diff-lcs (1.1.2)
-    find_by_hash (0.0.1)
-      activerecord
     i18n (0.4.1)
     nokogiri (1.4.3.1)
     rspec (2.0.0.beta.22)
@@ -41,9 +48,10 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  activerecord
-  find_by_hash
+  activerecord (>= 2.3.8)
+  bundler (>= 1.0.0)
+  lookup!
   nokogiri
   rspec (~> 2.0.0.beta.20)
-  sqlite3-ruby
+  sqlite3-ruby (>= 1.2.5)
   webmock

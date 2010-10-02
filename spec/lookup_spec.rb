@@ -1,9 +1,9 @@
 require File.dirname(__FILE__) + '/spec_helper'
 
 describe "Lookup" do
-  #before(:all) do
-  #  Lookup.update!
-  #end
+  before(:all) do
+   Lookup.update!
+  end
   
   def find_api(name)
     Lookup::Api.find_by_name(name)

@@ -1,10 +1,10 @@
-source 'http://rubygems.org'
-gem 'activerecord', :require => "active_record"
-gem 'nokogiri'
-gem 'find_by_hash'
-gem 'sqlite3-ruby'
+source :gemcutter
 
 group :test do
   gem 'rspec', '~> 2.0.0.beta.20'
   gem 'webmock'
 end
+
+# Specify your gem's dependencies in lookup.gemspec
+gemspec
+
