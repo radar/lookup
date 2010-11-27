@@ -19,7 +19,7 @@ end
 module Lookup
   APIS = []
   
-  class APINotFound < StandardError; end
+  class APINotFound < Exception; end
 
   class << self
     
@@ -134,7 +134,8 @@ module Lookup
     end
           
     def search(msg, options={})
-      options[:api] ||= msg.split.first
+      first_word = msg.split.first
+      options[:api] ||= first_word if apis.keys.include?(first_word)
       api_check = lambda { |options| (!apis.keys.map(&:to_s).include?(options[:api]) && !options[:api].is_a?(Api)) }
       # to_s because yaml interprets "1.8" as a literal 1.8
       # And because I'm super, super lazy
@@ -150,7 +151,9 @@ module Lookup
         search(msg, options.merge!(:api => api)) if api 
       end
       
-      options[:api] = Api.find_by_name!(apis[options[:api]]["name"]) unless options[:api].is_a?(Api)
+      options[:api] = Api.find_by_name!(apis[options[:api]]["name"]) if (options[:api] && apis[options[:api]].try(:[], "name")) && !options[:api].is_a?(Api)
+      
+      raise Lookup::APINotFound, "Could not determine what API the lookup is for" unless options[:api]
       
       # We want to retain message.
       msg = msg.gsub(/^(.*?)\s/, "")

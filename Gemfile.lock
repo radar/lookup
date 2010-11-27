@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    lookup (1.1.0)
+    lookup (1.1.1)
       activerecord (>= 2.3.8)
       nokogiri
       sqlite3-ruby (>= 1.2.5)

@@ -2,7 +2,7 @@ require File.dirname(__FILE__) + '/spec_helper'
 
 describe "Lookup" do
   before(:all) do
-   Lookup.update!
+   # Lookup.update!
   end
   
   def find_api(name)
