@@ -4,7 +4,7 @@ ENV['HOME'] = File.dirname(__FILE__)
 require 'rubygems'
 require 'bundler'
 
-Bundler.require(:default, :test)
+Bundler.require(:default, :development)
 
 def here
   Pathname.new(File.dirname(__FILE__))
