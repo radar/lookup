@@ -139,9 +139,8 @@ module Lookup
       api_check = lambda { |options| (!apis.keys.map(&:to_s).include?(options[:api]) && !options[:api].is_a?(Api)) }
       # to_s because yaml interprets "1.8" as a literal 1.8
       # And because I'm super, super lazy
-      if !@attempted_ruby && api_check.call(options)
+      if api_check.call(options)
         # Attempt a current Ruby lookup
-        @attempted_ruby = true
         api = case RUBY_VERSION
           when /^1.8/
             "1.8"
