@@ -22,7 +22,7 @@ def classes(api)
   File.read(apis + api + "classes.html")
 end
 
-include WebMock
+include WebMock::API
 
 WebMock.disable_net_connect!
 
