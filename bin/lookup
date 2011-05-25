@@ -46,9 +46,8 @@ def display_results(results, search_string)
   end
 end
 
-local_lib=Pathname.new(File.expand_path(File.dirname(__FILE__))) + "../lib/lookup.rb"
-if File.exists?(local_lib)
-  require local_lib
+if (local_lib = Pathname.new(File.expand_path('../../lib/lookup.rb', __FILE__))).file?
+  require local_lib.to_s
 else
   require 'rubygems'
   require 'lookup' 
