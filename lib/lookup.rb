@@ -195,4 +195,4 @@ module Lookup
   end
 end
 
-require 'lookup/models'
+require File.expand_path('../lookup/models', __FILE__)
